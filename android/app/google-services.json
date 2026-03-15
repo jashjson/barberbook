@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "285852592513",
+    "project_id": "barberbook-6d6eb",
+    "storage_bucket": "barberbook-6d6eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285852592513:android:469686c330c68df2a9a080",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq0sBFKFtHJOYm83QKSk6fSUd_GYwPCJM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
