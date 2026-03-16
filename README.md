@@ -167,4 +167,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 📬 Contact
 
-Built with ❤️ by Sylvia, Jershin Demetrius, J Asher, Jai Akash & Videsh 
+Built with ❤️ by Sylvia M, Angeline Maria S, Jershin Demetrius, J Asher, Jai Akash & Videsh 
