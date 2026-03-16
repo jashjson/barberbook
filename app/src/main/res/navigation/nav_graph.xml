@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.example.barberbook.ui.splash.SplashFragment"
+        android:label="SplashFragment"
+        tools:layout="@layout/fragment_splash">
+        <action
+            android:id="@+id/action_splashFragment_to_roleSelectionFragment"
+            app:destination="@id/roleSelectionFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/roleSelectionFragment"
+        android:name="com.example.barberbook.ui.auth.RoleSelectionFragment"
+        android:label="RoleSelectionFragment"
+        tools:layout="@layout/fragment_role_selection">
+        <action
+            android:id="@+id/action_roleSelectionFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.barberbook.ui.auth.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <argument
+            android:name="role"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_loginFragment_to_customerHomeFragment"
+            app:destination="@id/customerHomeFragment"
+            app:popUpTo="@id/roleSelectionFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_barberDashboardFragment"
+            app:destination="@id/barberDashboardFragment"
+            app:popUpTo="@id/roleSelectionFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Customer Destinations -->
+    <fragment
+        android:id="@+id/customerHomeFragment"
+        android:name="com.example.barberbook.ui.customer.home.CustomerHomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_customer_home" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.barberbook.ui.customer.search.SearchFragment"
+        android:label="Search" />
+
+    <fragment
+        android:id="@+id/myBookingsFragment"
+        android:name="com.example.barberbook.ui.customer.mybookings.MyBookingsFragment"
+        android:label="Bookings" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.barberbook.ui.customer.profile.CustomerProfileFragment"
+        android:label="Profile" />
+
+    <!-- Barber Destinations -->
+    <fragment
+        android:id="@+id/barberDashboardFragment"
+        android:name="com.example.barberbook.ui.barber.dashboard.BarberDashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_barber_dashboard" />
+
+    <fragment
+        android:id="@+id/barberAppointmentsFragment"
+        android:name="com.example.barberbook.ui.barber.appointments.BarberAppointmentsFragment"
+        android:label="Appointments" />
+
+    <fragment
+        android:id="@+id/barberServicesFragment"
+        android:name="com.example.barberbook.ui.barber.services.BarberServicesFragment"
+        android:label="Services" />
+
+    <fragment
+        android:id="@+id/barberProfileFragment"
+        android:name="com.example.barberbook.ui.barber.profile.BarberProfileFragment"
+        android:label="Profile" />
+
+</navigation>

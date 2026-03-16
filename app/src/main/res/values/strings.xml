@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BarberBook</string>
+    <string name="tagline">Your Personal Grooming Assistant</string>
+    
+    <!-- Role Selection -->
+    <string name="role_selection_title">Welcome to BarberBook</string>
+    <string name="role_selection_subtitle">How would you like to continue?</string>
+    <string name="customer_role">I\'m a Customer</string>
+    <string name="customer_role_desc">Book haircuts, grooming, and more at your favorite shops.</string>
+    <string name="barber_role">I\'m a Barber</string>
+    <string name="barber_role_desc">Manage your shop, appointments, and grow your business.</string>
+    
+    <!-- Auth -->
+    <string name="login_title">Login / Register</string>
+    <string name="phone_number_hint">Phone Number</string>
+    <string name="full_name_hint">Full Name</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="verify_otp">Verify OTP</string>
+    <string name="resend_otp">Resend OTP</string>
+    <string name="otp_hint">Enter 6-digit OTP</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_bookings">Bookings</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_services">Services</string>
+    <string name="nav_schedule">Schedule</string>
+</resources>

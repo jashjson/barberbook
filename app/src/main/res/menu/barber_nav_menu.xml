@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/barberDashboardFragment"
+        android:icon="@drawable/ic_dashboard"
+        android:title="@string/nav_dashboard" />
+    <item
+        android:id="@+id/barberAppointmentsFragment"
+        android:icon="@drawable/ic_bookings"
+        android:title="@string/nav_bookings" />
+    <item
+        android:id="@+id/barberServicesFragment"
+        android:icon="@drawable/ic_services"
+        android:title="@string/nav_services" />
+    <item
+        android:id="@+id/barberProfileFragment"
+        android:icon="@drawable/ic_account_box"
+        android:title="@string/nav_profile" />
+</menu>
