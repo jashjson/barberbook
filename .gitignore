@@ -1,0 +1,6 @@
+# Ignore all build outputs
+build/
+
+# But not the release APK
+!build/app/outputs/flutter-apk/app-release.apk
+build/

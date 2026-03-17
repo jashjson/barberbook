@@ -1,0 +1,381 @@
+import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
+import '../../models/models.dart';
+import '../../services/firebase_service.dart';
+
+class AppointmentsScreen extends StatefulWidget {
+  const AppointmentsScreen({super.key});
+  @override
+  State<AppointmentsScreen> createState() => _AppointmentsScreenState();
+}
+
+class _AppointmentsScreenState extends State<AppointmentsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tab;
+  @override
+  void initState() {
+    super.initState();
+    _tab = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
+
+  Future<void> _update(String id, String status) async {
+    await FirebaseService.updateAppointmentStatus(id, status);
+    if (!mounted) return;
+    final msg = status == 'confirmed'
+        ? 'Confirmed ✓'
+        : status == 'cancelled'
+        ? 'Cancelled'
+        : 'Marked done ✓';
+    final color = status == 'cancelled'
+        ? const Color(0xFFE24B4A)
+        : AppTheme.primary;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: color));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: StreamBuilder<List<AppointmentModel>>(
+          stream: FirebaseService.getBarberAppointmentsStream(),
+          builder: (context, snap) {
+            final all = snap.data ?? [];
+            final pending = all.where((a) => a.status == 'pending').toList();
+            final confirmed = all
+                .where((a) => a.status == 'confirmed')
+                .toList();
+            final completed = all
+                .where((a) => a.status == 'completed')
+                .toList();
+            final cancelled = all
+                .where((a) => a.status == 'cancelled')
+                .toList();
+
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Appointments',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textDark,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '${all.length} total',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: TabBar(
+                    controller: _tab,
+                    indicator: BoxDecoration(
+                      color: AppTheme.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: AppTheme.textGrey,
+                    labelStyle: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
+                    ),
+                    tabs: [
+                      Tab(text: 'Pending\n(${pending.length})'),
+                      Tab(text: 'Confirmed\n(${confirmed.length})'),
+                      Tab(text: 'Done\n(${completed.length})'),
+                      Tab(text: 'Cancelled\n(${cancelled.length})'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                if (snap.connectionState == ConnectionState.waiting)
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tab,
+                      children: [
+                        _List(
+                          appts: pending,
+                          showConfirm: true,
+                          showDone: false,
+                          onUpdate: _update,
+                        ),
+                        _List(
+                          appts: confirmed,
+                          showConfirm: false,
+                          showDone: true,
+                          onUpdate: _update,
+                        ),
+                        _List(
+                          appts: completed,
+                          showConfirm: false,
+                          showDone: false,
+                          onUpdate: _update,
+                        ),
+                        _List(
+                          appts: cancelled,
+                          showConfirm: false,
+                          showDone: false,
+                          onUpdate: _update,
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _List extends StatelessWidget {
+  final List<AppointmentModel> appts;
+  final bool showConfirm, showDone;
+  final Future<void> Function(String, String) onUpdate;
+  const _List({
+    required this.appts,
+    required this.showConfirm,
+    required this.showDone,
+    required this.onUpdate,
+  });
+  @override
+  Widget build(BuildContext context) {
+    if (appts.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.calendar_today_rounded,
+              size: 48,
+              color: AppTheme.textGrey.withValues(alpha: 0.3),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'No appointments',
+              style: TextStyle(color: AppTheme.textGrey),
+            ),
+          ],
+        ),
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: appts.length,
+      itemBuilder: (_, i) => _Card(
+        appt: appts[i],
+        showConfirm: showConfirm,
+        showDone: showDone,
+        onUpdate: onUpdate,
+      ),
+    );
+  }
+}
+
+class _Card extends StatelessWidget {
+  final AppointmentModel appt;
+  final bool showConfirm, showDone;
+  final Future<void> Function(String, String) onUpdate;
+  const _Card({
+    required this.appt,
+    required this.showConfirm,
+    required this.showDone,
+    required this.onUpdate,
+  });
+
+  Color get _statusColor {
+    if (appt.status == 'confirmed') return const Color(0xFF1D9E75);
+    if (appt.status == 'pending') return const Color(0xFFEF9F27);
+    if (appt.status == 'cancelled') return const Color(0xFFE24B4A);
+    return AppTheme.primary;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
+                child: Text(
+                  appt.customerInitial,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.primary,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  appt.customerName,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textDark,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  appt.status[0].toUpperCase() + appt.status.substring(1),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: _statusColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: AppTheme.border),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(
+                Icons.content_cut_rounded,
+                size: 14,
+                color: AppTheme.textGrey,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  appt.serviceName,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppTheme.textGrey,
+                  ),
+                ),
+              ),
+              Text(
+                '₹${appt.price}',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(
+                Icons.access_time_rounded,
+                size: 14,
+                color: AppTheme.textGrey,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '${appt.date}  ·  ${appt.timeSlot}',
+                style: const TextStyle(fontSize: 13, color: AppTheme.textGrey),
+              ),
+            ],
+          ),
+          if (showConfirm || showDone) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => onUpdate(appt.id, 'cancelled'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(0, 38),
+                      foregroundColor: const Color(0xFFE24B4A),
+                      side: const BorderSide(color: Color(0xFFE24B4A)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => onUpdate(
+                      appt.id,
+                      showConfirm ? 'confirmed' : 'completed',
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(0, 38),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(showConfirm ? 'Confirm' : 'Mark Done'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
