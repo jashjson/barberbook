@@ -1,0 +1,1 @@
+ /home/user/myapp/.dart_tool/flutter_build/58a59067e8b21f2061ee7cbeeacc921c/native_assets.json: 
