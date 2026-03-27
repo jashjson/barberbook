@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BarberBook — Skip the Wait</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Barber<span>Book</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#download">Download</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">✂</div>
+  <div class="hero-left">
+    <div class="hero-tag">Now Available on Android</div>
+    <h1>
+      Skip The<br>
+      <span class="gold">Wait.</span><br>
+      <span class="italic">Book Smarter.</span>
+    </h1>
+    <p class="hero-desc">
+      BarberBook is a token-based appointment system for barber shops. No more queues, no more guessing. Book your slot, get your token, walk in on time.
+    </p>
+    <div class="hero-cta">
+      <a href="#download" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414C17.523 13.3582 16.2062 11.9467 14.4391 11.9467C13.3176 11.9467 12.5469 12.5411 12.1406 13.0117C11.7344 12.5411 10.9637 11.9467 9.84219 11.9467C8.07504 11.9467 6.75824 13.3582 6.75824 15.3414C6.75824 18.2176 9.82188 21.1523 10.7469 21.9258C11.3687 22.4648 13.043 22.4648 13.6648 21.9258C14.5898 21.1523 17.523 18.2176 17.523 15.3414ZM12.0 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        <span>Download APK</span>
+      </a>
+      <a href="#features" class="btn-secondary">
+        Explore Features →
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="phone-wrap">
+      <div class="phone-glow"></div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="app-header">
+            <div class="app-logo-small">✂ BB</div>
+            <div class="app-avatar">RK</div>
+          </div>
+
+          <div class="token-card">
+            <div class="token-label">Your Token</div>
+            <div class="token-num">#04</div>
+            <div class="token-time">⏰ 11:20 AM — Est. Wait: 12 min</div>
+            <div class="token-barber">Barber: Ravi Kumar · Classic Cut</div>
+          </div>
+
+          <div style="font-size:0.6rem; letter-spacing:2px; color:#555; text-transform:uppercase; margin-bottom:8px;">Live Queue</div>
+
+          <div class="queue-list">
+            <div class="queue-item">
+              <div class="queue-num">#01</div>
+              <div class="queue-info">
+                <div class="queue-name">Arjun S.</div>
+                <div class="queue-sub">10:00 AM · Fade + Beard</div>
+              </div>
+              <span class="queue-badge badge-active">In Chair</span>
+            </div>
+            <div class="queue-item">
+              <div class="queue-num">#02</div>
+              <div class="queue-info">
+                <div class="queue-name">Karthik M.</div>
+                <div class="queue-sub">10:30 AM · Simple Trim</div>
+              </div>
+              <span class="queue-badge badge-wait">Waiting</span>
+            </div>
+            <div class="queue-item">
+              <div class="queue-num">#03</div>
+              <div class="queue-info">
+                <div class="queue-name">Deepak R.</div>
+                <div class="queue-sub">11:00 AM · Full Style</div>
+              </div>
+              <span class="queue-badge badge-wait">Waiting</span>
+            </div>
+            <div class="queue-item" style="opacity:0.5;">
+              <div class="queue-num" style="color:#555">#04</div>
+              <div class="queue-info">
+                <div class="queue-name">You</div>
+                <div class="queue-sub">11:20 AM · Classic Cut</div>
+              </div>
+              <span class="queue-badge badge-wait">You</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pole"></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat-item">
+    <div class="stat-num">₹80K<span style="font-size:1.5rem">Cr</span></div>
+    <div class="stat-label">Indian Grooming Market</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">0</div>
+    <div class="stat-label">Waiting Time For You</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">3x</div>
+    <div class="stat-label">More Bookings Per Day</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">100%</div>
+    <div class="stat-label">Walk-in Alternative</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="section-tag">The Problem</div>
+  <h2 class="section-title">BARBER SHOPS ARE<br><span style="color:var(--gold)">STUCK IN 1995.</span></h2>
+
+  <div class="problem-grid">
+    <div class="pain-list reveal">
+      <div class="pain-item">
+        <div class="pain-icon">😤</div>
+        <div>
+          <div class="pain-title">You Wait. And Wait. And Wait.</div>
+          <div class="pain-desc">Walk into any barber shop in India and you're met with plastic chairs, a TV playing old songs, and zero clarity on how long you'll be there.</div>
+        </div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">📞</div>
+        <div>
+          <div class="pain-title">Booking? Just WhatsApp Them.</div>
+          <div class="pain-desc">Most shops have no system. You call, they forget. You WhatsApp, they miss it. You just show up and hope for the best.</div>
+        </div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">💸</div>
+        <div>
+          <div class="pain-title">Barbers Lose Money on Empty Slots</div>
+          <div class="pain-desc">Last-minute cancellations and no-shows leave barbers with dead time and lost income they can't recover.</div>
+        </div>
+      </div>
+      <div class="pain-item">
+        <div class="pain-icon">🤷</div>
+        <div>
+          <div class="pain-title">No Visibility. No Control.</div>
+          <div class="pain-desc">Shop owners have no idea how many customers are coming today. No data. No planning. Just vibes.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="solution-box reveal">
+      <div class="solution-title">BarberBook Fixes This.</div>
+      <p style="font-size:0.88rem;color:#888;line-height:1.7;">We're bringing the same logic that Uber used for cabs and Zomato used for food — to your neighbourhood barber shop.</p>
+      <div class="solution-steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-text"><strong>Real-time token system</strong> — see exactly who's ahead of you and when your turn is.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-text"><strong>Pre-book your slot</strong> — choose your barber, choose your time, get a confirmation instantly.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-text"><strong>Barber dashboard</strong> — barbers see their full day at a glance. No surprises.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-text"><strong>Owner analytics</strong> — daily bookings, peak hours, revenue tracking — all in one screen.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="scissors-divider">✦ ✂ ✦</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div style="text-align:center;">
+    <div class="section-tag" style="justify-content:center;">Features</div>
+    <h2 class="section-title reveal">EVERYTHING A BARBER<br><span style="color:var(--gold)">SHOP NEEDS.</span></h2>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <span class="feature-icon">🎟️</span>
+      <div class="feature-title">Token Queue System</div>
+      <div class="feature-desc">FCFS-based token assignment. Book online, get your number, know your exact slot before you leave home.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">✂️</span>
+      <div class="feature-title">Choose Your Barber</div>
+      <div class="feature-desc">Each barber has their own queue. Pick your favourite, see their availability, book directly with them.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⏱️</span>
+      <div class="feature-title">Live Wait Time</div>
+      <div class="feature-desc">Real-time updates on the queue. Watch your token move up. Get notified when you're next.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📅</span>
+      <div class="feature-title">Easy Reschedule</div>
+      <div class="feature-desc">Plans changed? Reschedule or cancel with a tap. Your slot goes back to the pool for someone else.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <div class="feature-title">Owner Dashboard</div>
+      <div class="feature-desc">See daily bookings, peak hours, per-barber stats and revenue — all in a clean overview screen.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔔</span>
+      <div class="feature-title">Smart Reminders</div>
+      <div class="feature-desc">Push notifications remind customers 30 minutes before their slot. Fewer no-shows. More revenue.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div style="text-align:center;">
+    <div class="section-tag" style="justify-content:center;">How It Works</div>
+    <h2 class="section-title reveal">BOOK IN<br><span style="color:var(--gold)">4 STEPS.</span></h2>
+  </div>
+  <div class="steps-row reveal">
+    <div class="how-step">
+      <div class="how-num">1</div>
+      <div class="how-title">Open the App</div>
+      <div class="how-desc">Find your nearest listed barber shop or scan their QR code at the entrance.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">2</div>
+      <div class="how-title">Pick a Slot</div>
+      <div class="how-desc">Choose your barber and a time that works. See real-time availability before you book.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">3</div>
+      <div class="how-title">Get Your Token</div>
+      <div class="how-desc">Instantly receive your token number and estimated time. Save it or screenshot it.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-num">4</div>
+      <div class="how-title">Walk In On Time</div>
+      <div class="how-desc">Show up at your slot. No waiting. Sit in the chair, get your cut, walk out.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="download" id="download">
+  <div class="section-tag" style="justify-content:center; position:relative;z-index:1;">Android App</div>
+  <h2 class="download-title">GET THE<br><span style="color:var(--gold)">APP NOW.</span></h2>
+  <p class="download-sub">Direct APK download — no Play Store needed. Install in seconds and start booking smarter.</p>
+
+  <a href="barberbook.apk" class="download-btn" download="barberbook.apk">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
+    Download APK — Free
+  </a>
+
+  <div class="apk-note">
+    Version 1.0.0 · Android 6.0+ · <span>~18 MB</span> · No ads. No BS.
+  </div>
+
+  <div class="install-steps">
+    <div class="install-step">
+      <strong>Step 1 — Download</strong>
+      Tap the button above to download the APK file to your phone.
+    </div>
+    <div class="install-step">
+      <strong>Step 2 — Allow Install</strong>
+      Go to Settings → Security → enable "Install from Unknown Sources."
+    </div>
+    <div class="install-step">
+      <strong>Step 3 — Open APK</strong>
+      Find the file in your Downloads folder and tap to install.
+    </div>
+    <div class="install-step">
+      <strong>Step 4 — Book Away</strong>
+      Open BarberBook, find your shop, and never wait in a barber queue again.
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">✂ BarberBook</div>
+  <div class="footer-copy">© 2026 BarberBook · Built with Python, Flutter & Firebase</div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
