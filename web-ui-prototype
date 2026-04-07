@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BarberBook</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1D9E75;--green-dark:#18895e;--purple:#7F77DD;--purple-dark:#6b63cc;
+  --bg:#F6F7F9;--white:#FFFFFF;--dark:#1A1A2E;--grey:#8A8A9A;--border:#E8E8F0;
+  --red:#E24B4A;--amber:#EF9F27;
+  --green-tint:rgba(29,158,117,.1);--purple-tint:rgba(127,119,221,.1);
+  --red-tint:rgba(226,75,74,.1);--amber-tint:rgba(239,159,39,.1);
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06);--shadow-md:0 4px 16px rgba(0,0,0,.08);
+  --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--dark);min-height:100vh;font-size:14px;overflow-x:hidden;}
+button{font-family:inherit;cursor:pointer;}
+input,textarea,select{font-family:inherit;}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;background:var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;transition:opacity .5s ease;}
+#splash.fade{opacity:0;pointer-events:none;}
+.spl-logo{width:108px;height:108px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:52px;box-shadow:0 12px 40px rgba(0,0,0,.18);margin-bottom:28px;animation:splashPop .9s cubic-bezier(.34,1.56,.64,1) both;}
+.spl-name{font-size:38px;font-weight:800;color:#fff;letter-spacing:.4px;animation:slideUp .5s .3s both;}
+.spl-sub{font-size:14px;color:rgba(255,255,255,.72);margin-top:8px;animation:slideUp .5s .45s both;}
+.spl-dots{display:flex;gap:8px;margin-top:56px;animation:slideUp .4s .6s both;}
+.spl-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);}
+.spl-dot:first-child{background:#fff;}
+@keyframes splashPop{from{transform:scale(.65);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ROLE SCREEN ── */
+#roleScreen{position:fixed;inset:0;background:var(--white);z-index:800;display:none;flex-direction:column;padding:32px 24px;overflow-y:auto;}
+#roleScreen.show{display:flex;}
+.role-logo{display:flex;align-items:center;gap:10px;margin-bottom:48px;}
+.role-logo-mark{width:40px;height:40px;background:var(--green-tint);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.role-logo-text{font-size:20px;font-weight:800;color:var(--green);}
+.role-heading{font-size:34px;font-weight:800;line-height:1.15;margin-bottom:8px;}
+.role-sub{font-size:14px;color:var(--grey);margin-bottom:48px;}
+.role-card{border:1.5px solid var(--border);border-radius:var(--r-xl);padding:22px;margin-bottom:18px;cursor:pointer;transition:border-color .2s,box-shadow .2s;background:var(--white);}
+.role-card:hover{border-color:var(--green);box-shadow:0 8px 24px rgba(29,158,117,.12);}
+.role-card.cust:hover{border-color:var(--purple);box-shadow:0 8px 24px rgba(127,119,221,.12);}
+.role-card-top{display:flex;align-items:center;gap:16px;}
+.role-card-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.role-card-info{flex:1;}
+.role-card-title{font-size:18px;font-weight:700;}
+.role-card-desc{font-size:12px;color:var(--grey);line-height:1.5;margin-top:2px;}
+.role-card-arrow{font-size:18px;color:var(--grey);}
+.role-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.role-tag{font-size:11.5px;font-weight:600;padding:5px 12px;border-radius:20px;}
+.role-footer{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:auto;padding-top:20px;font-size:12px;color:var(--grey);}
+
+/* ── AUTH SCREEN ── */
+#authScreen{position:fixed;inset:0;background:var(--white);z-index:800;display:none;flex-direction:column;}
+#authScreen.show{display:flex;}
+.auth-body{padding:28px 24px;flex:1;display:flex;flex-direction:column;overflow-y:auto;}
+.auth-back{width:42px;height:42px;border:1px solid var(--border);border-radius:12px;background:none;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:30px;flex-shrink:0;}
+.auth-icon-wrap{width:fit-content;padding:14px;border-radius:18px;margin-bottom:24px;font-size:30px;line-height:1;}
+.auth-title{font-size:30px;font-weight:800;margin-bottom:8px;}
+.auth-sub{font-size:14px;color:var(--grey);line-height:1.55;margin-bottom:36px;}
+.phone-field{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r-md);overflow:hidden;margin-bottom:12px;transition:border-color .2s;}
+.phone-field:focus-within{border-color:var(--green);}
+.phone-prefix{padding:14px;font-size:15px;font-weight:600;border-right:1px solid var(--border);white-space:nowrap;color:var(--dark);}
+.phone-input{flex:1;padding:14px;font-size:18px;font-weight:600;border:none;outline:none;letter-spacing:2px;color:var(--dark);}
+.otp-row{display:flex;gap:10px;margin-bottom:28px;justify-content:center;}
+.otp-box{width:50px;height:58px;border:1.5px solid var(--border);border-radius:var(--r-md);text-align:center;font-size:24px;font-weight:700;outline:none;color:var(--dark);transition:border-color .2s;}
+.otp-box:focus{border-color:var(--green);border-width:2px;}
+.resend-row{text-align:center;font-size:13px;color:var(--grey);margin-top:16px;}
+.resend-link{color:var(--green);font-weight:700;cursor:pointer;}
+.terms{font-size:12px;color:var(--grey);text-align:center;margin-top:18px;line-height:1.6;}
+
+/* ── MAIN APP ── */
+#app{display:none;min-height:100vh;}
+#app.show{display:flex;}
+.sidebar{width:248px;background:var(--white);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;z-index:100;display:flex;flex-direction:column;overflow-y:auto;}
+.content{margin-left:248px;flex:1;min-height:100vh;}
+
+.sb-header{padding:22px 18px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.sb-logo-mark{width:36px;height:36px;background:var(--green-tint);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.sb-logo-text{font-size:17px;font-weight:800;color:var(--green);}
+.role-switcher{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin:10px 12px 4px;}
+.rsw-btn{flex:1;padding:7px 6px;border:none;background:none;border-radius:8px;font-size:11.5px;font-weight:700;color:var(--grey);transition:.15s;}
+.rsw-btn.active{background:var(--white);color:var(--green);box-shadow:var(--shadow-sm);}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--grey);padding:14px 18px 6px;}
+.sb-nav{display:flex;flex-direction:column;gap:2px;padding:4px 10px;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:none;background:none;width:100%;text-align:left;font-size:13.5px;font-weight:500;color:var(--grey);transition:.15s;position:relative;}
+.nav-btn:hover{background:var(--bg);color:var(--dark);}
+.nav-btn.active-green{background:var(--green-tint);color:var(--green);font-weight:700;}
+.nav-btn.active-purple{background:var(--purple-tint);color:var(--purple);font-weight:700;}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.sb-footer{margin-top:auto;padding:10px 10px 14px;border-top:1px solid var(--border);}
+.notif-dot{width:16px;height:16px;background:var(--red);color:#fff;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:auto;}
+
+/* ── PAGES ── */
+.page{display:none;padding:24px 28px;max-width:900px;}
+.page.active{display:block;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:12px;}
+.page-title{font-size:22px;font-weight:800;}
+.page-subtitle{font-size:13px;color:var(--grey);margin-top:3px;}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--r-lg);border:1px solid var(--border);padding:20px;}
+.card-sm{background:var(--white);border-radius:var(--r-md);border:1px solid var(--border);padding:14px;}
+
+/* ── STAT ROW ── */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.stat-card{background:var(--white);border-radius:var(--r-md);border:1px solid var(--border);padding:14px;}
+.stat-val{font-size:24px;font-weight:800;margin:6px 0 2px;}
+.stat-lbl{font-size:11px;color:var(--grey);}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:var(--green-tint);color:var(--green);}
+.badge-purple{background:var(--purple-tint);color:var(--purple);}
+.badge-amber{background:var(--amber-tint);color:var(--amber);}
+.badge-red{background:var(--red-tint);color:var(--red);}
+.badge-grey{background:rgba(138,138,154,.1);color:var(--grey);}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:13px 22px;border-radius:var(--r-md);border:none;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;font-family:inherit;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover:not(:disabled){background:var(--green-dark);}
+.btn-purple{background:var(--purple);color:#fff;}.btn-purple:hover:not(:disabled){background:var(--purple-dark);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--dark);}.btn-outline:hover{border-color:var(--grey);}
+.btn-red-outline{background:transparent;border:1.5px solid var(--red);color:var(--red);}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:var(--r-sm);}
+.btn-full{width:100%;}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:18px;}
+
+/* ── SEARCH ── */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--grey);font-size:16px;pointer-events:none;}
+.search-input{width:100%;padding:13px 14px 13px 40px;border:1px solid var(--border);border-radius:var(--r-md);font-size:14px;background:var(--white);color:var(--dark);outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:var(--green);}
+
+/* ── FILTER PILLS ── */
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-pill{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--white);font-size:13px;font-weight:600;color:var(--grey);cursor:pointer;transition:.15s;}
+.filter-pill.on{background:var(--purple);border-color:var(--purple);color:#fff;}
+.filter-pill:hover:not(.on){background:var(--bg);}
+
+/* ── PROMO BANNER ── */
+.promo-banner{background:var(--purple);border-radius:var(--r-lg);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.promo-claim{background:#fff;color:var(--purple);border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;}
+
+/* ── BARBER CARD ── */
+.barber-card{background:var(--white);border-radius:var(--r-lg);border:1px solid var(--border);padding:16px;display:flex;gap:14px;cursor:pointer;transition:.2s;margin-bottom:12px;}
+.barber-card:hover{border-color:var(--purple);box-shadow:0 4px 20px rgba(127,119,221,.12);}
+.barber-avatar{width:60px;height:60px;border-radius:50%;background:var(--purple-tint);color:var(--purple);font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+.online-indicator{position:absolute;bottom:1px;right:1px;width:14px;height:14px;border-radius:50%;border:2.5px solid var(--white);}
+.barber-info{flex:1;min-width:0;}
+.barber-name{font-size:15px;font-weight:700;}
+.barber-shop{font-size:12px;color:var(--grey);}
+.barber-meta{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:12px;color:var(--grey);flex-wrap:wrap;}
+.barber-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.barber-price{font-size:13px;font-weight:700;color:var(--purple);}
+.fav-btn{background:none;border:none;font-size:18px;padding:2px;cursor:pointer;line-height:1;}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-title{font-size:17px;font-weight:700;}
+.sec-count{font-size:13px;color:var(--grey);}
+
+/* ── STATUS BANNER ── */
+.status-banner{border-radius:var(--r-lg);padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;border:none;width:100%;text-align:left;margin-bottom:14px;transition:.2s;}
+.status-dot-box{width:34px;height:34px;background:rgba(255,255,255,.22);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ── APPOINTMENT CARD ── */
+.appt-card{background:var(--white);border-radius:var(--r-md);border:1px solid var(--border);padding:14px;margin-bottom:10px;}
+.appt-row{display:flex;align-items:center;gap:10px;}
+.appt-divider{width:1px;height:40px;background:var(--border);flex-shrink:0;}
+.appt-avatar{width:36px;height:36px;border-radius:50%;background:var(--green-tint);color:var(--green);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.appt-info{flex:1;min-width:0;}
+.appt-actions{display:flex;gap:8px;margin-top:10px;}
+
+/* ── BOOKING STEPS ── */
+.steps-row{display:flex;align-items:flex-start;margin-bottom:22px;}
+.step-col{display:flex;flex-direction:column;align-items:center;flex:1;}
+.step-line{flex:1;height:2px;margin-top:14px;}
+.step-circle{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.step-name{font-size:10px;margin-top:4px;font-weight:600;text-align:center;}
+
+/* ── SERVICE SELECT ── */
+.service-row{border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s;margin-bottom:10px;}
+.service-row:hover,.service-row.sel{border-color:var(--purple);}
+.service-row.sel{background:rgba(127,119,221,.04);}
+.service-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+
+/* ── DATE PICKER ── */
+.date-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;}
+.date-chip{min-width:62px;height:84px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s;}
+.date-chip:hover:not(.disabled):not(.active){border-color:var(--purple);}
+.date-chip.active{background:var(--purple);border-color:var(--purple);}
+.date-chip.disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── TIME GRID ── */
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.time-chip{padding:10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--white);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:.2s;}
+.time-chip:hover:not(.booked):not(.active){border-color:var(--purple);}
+.time-chip.active{background:var(--purple);border-color:var(--purple);color:#fff;}
+.time-chip.booked{background:var(--bg);color:rgba(138,138,154,.45);cursor:not-allowed;}
+
+/* ── CONFIRM ROWS ── */
+.conf-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.conf-row:last-child{border-bottom:none;}
+.conf-key{font-size:13px;color:var(--grey);flex:1;}
+.conf-val{font-size:14px;font-weight:700;}
+
+/* ── TABS ── */
+.tab-bar{display:flex;background:var(--white);border-radius:12px;padding:4px;border:1px solid var(--border);margin-bottom:16px;}
+.tab-btn{flex:1;padding:9px 4px;border-radius:9px;border:none;background:none;font-size:12.5px;font-weight:700;color:var(--grey);cursor:pointer;transition:.15s;text-align:center;}
+.tab-btn.active{background:var(--bg);color:var(--dark);box-shadow:var(--shadow-sm);}
+
+/* ── EARNINGS ── */
+.earnings-card{background:var(--green);border-radius:var(--r-xl);padding:24px;color:#fff;margin-bottom:14px;}
+.earnings-total{font-size:42px;font-weight:800;margin:6px 0 18px;}
+.bar-chart{display:flex;align-items:flex-end;justify-content:space-between;height:110px;margin-top:14px;padding:0 4px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.bar-fill{width:24px;border-radius:6px;background:rgba(255,255,255,.72);}
+.bar-lbl{font-size:10px;color:rgba(255,255,255,.6);}
+.bar-amt{font-size:9px;color:rgba(255,255,255,.8);}
+
+/* ── NOTIFICATIONS ── */
+.notif-card{background:var(--white);border-radius:var(--r-md);border:1px solid var(--border);padding:14px;display:flex;gap:12px;cursor:pointer;margin-bottom:10px;transition:.15s;}
+.notif-card.unread{border-left:3.5px solid var(--green);}
+.notif-card:hover{background:var(--bg);}
+.notif-icon-box{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+
+/* ── AVAILABILITY ── */
+.avail-row{background:var(--white);border-radius:var(--r-md);border:1px solid var(--border);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.avail-day{font-size:14px;font-weight:700;width:90px;flex-shrink:0;}
+.avail-time{font-size:13px;color:var(--grey);flex:1;}
+.toggle{position:relative;width:48px;height:26px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-track{position:absolute;inset:0;background:var(--border);border-radius:13px;cursor:pointer;transition:.3s;}
+.toggle-track:before{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;left:3px;top:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.18);}
+.toggle input:checked+.toggle-track{background:var(--green);}
+.toggle input:checked+.toggle-track:before{transform:translateX(22px);}
+
+/* ── EDIT FIELDS ── */
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+.field label{font-size:12px;font-weight:700;color:var(--grey);}
+.field input,.field textarea,.field select{padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;color:var(--dark);outline:none;resize:vertical;transition:border-color .2s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--green);}
+
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;display:none;align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.sheet{background:var(--white);border-radius:var(--r-xl) var(--r-xl) 0 0;width:100%;max-width:560px;padding:24px 24px 36px;animation:sheetUp .25s ease;}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-title{font-size:18px;font-weight:800;margin-bottom:16px;}
+
+.dialog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:700;display:none;align-items:center;justify-content:center;}
+.dialog-overlay.show{display:flex;}
+.dialog{background:var(--white);border-radius:var(--r-xl);padding:26px;max-width:380px;width:90%;animation:dialogPop .25s ease;}
+@keyframes dialogPop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+
+.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:700;display:none;align-items:center;justify-content:center;}
+.success-overlay.show{display:flex;}
+.success-box{background:var(--white);border-radius:var(--r-xl);padding:32px 28px;max-width:340px;width:90%;text-align:center;animation:dialogPop .3s ease;}
+.success-icon{width:84px;height:84px;background:var(--green-tint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 18px;}
+
+/* ── SNACKBAR ── */
+.snack{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--dark);color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:.28s;pointer-events:none;white-space:nowrap;}
+.snack.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* ── LOADER ── */
+.spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:48px 20px;color:var(--grey);}
+.empty-icon{font-size:44px;margin-bottom:12px;opacity:.3;}
+
+/* ── MOBILE NAV ── */
+@media(max-width:768px){
+  .sidebar{width:100%;height:60px;position:fixed;top:auto;bottom:0;flex-direction:row;border-right:none;border-top:1px solid var(--border);z-index:200;overflow:hidden;}
+  .content{margin-left:0;margin-bottom:60px;}
+  .sb-header,.role-switcher,.sb-section,.sb-footer{display:none!important;}
+  .sb-nav{flex-direction:row;padding:0;gap:0;flex:1;}
+  .nav-btn{flex-direction:column;padding:6px 4px;gap:2px;flex:1;min-width:0;border-radius:0;font-size:9.5px;justify-content:center;text-align:center;}
+  .nav-icon{margin:0;font-size:20px;width:auto;}
+  .page{padding:14px 14px 20px;}
+  .time-grid{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="spl-logo">✂️</div>
+  <div class="spl-name">BarberBook</div>
+  <div class="spl-sub">Book your perfect cut</div>
+  <div class="spl-dots">
+    <div class="spl-dot"></div><div class="spl-dot"></div><div class="spl-dot"></div>
+  </div>
+</div>
+
+<!-- ROLE SELECTION -->
+<div id="roleScreen">
+  <div class="role-logo">
+    <div class="role-logo-mark">✂️</div>
+    <div class="role-logo-text">BarberBook</div>
+  </div>
+  <div class="role-heading">Who are you?</div>
+  <div class="role-sub">Choose your role to get started.</div>
+  <div class="role-card" onclick="chooseRole('barber')">
+    <div class="role-card-top">
+      <div class="role-card-icon" style="background:var(--green-tint)">✂️</div>
+      <div class="role-card-info">
+        <div class="role-card-title" style="color:var(--green)">I'm a Barber</div>
+        <div class="role-card-desc">Manage appointments,<br>set availability & track earnings</div>
+      </div>
+      <div class="role-card-arrow">›</div>
+    </div>
+    <div class="role-tags">
+      <span class="role-tag" style="background:var(--green-tint);color:var(--green)">Set working hours</span>
+      <span class="role-tag" style="background:var(--green-tint);color:var(--green)">Confirm bookings</span>
+      <span class="role-tag" style="background:var(--green-tint);color:var(--green)">Track earnings</span>
+    </div>
+  </div>
+  <div class="role-card cust" onclick="chooseRole('customer')">
+    <div class="role-card-top">
+      <div class="role-card-icon" style="background:var(--purple-tint)">👤</div>
+      <div class="role-card-info">
+        <div class="role-card-title" style="color:var(--purple)">I'm a Customer</div>
+        <div class="role-card-desc">Discover barbers,<br>book appointments & leave reviews</div>
+      </div>
+      <div class="role-card-arrow">›</div>
+    </div>
+    <div class="role-tags">
+      <span class="role-tag" style="background:var(--purple-tint);color:var(--purple)">Find nearby barbers</span>
+      <span class="role-tag" style="background:var(--purple-tint);color:var(--purple)">Book time slots</span>
+      <span class="role-tag" style="background:var(--purple-tint);color:var(--purple)">Rate experience</span>
+    </div>
+  </div>
+  <div class="role-footer">🔒 Secured with phone verification</div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-body">
+    <button class="auth-back" onclick="showRole()">←</button>
+    <div class="auth-icon-wrap" id="authIconWrap"></div>
+    <div class="auth-title" id="authTitle">Login</div>
+    <div class="auth-sub" id="authSub">We'll send a one-time verification code.</div>
+    <div id="phoneStep">
+      <div class="phone-field">
+        <div class="phone-prefix">🇮🇳 +91</div>
+        <input class="phone-input" id="phoneInput" type="tel" maxlength="10" placeholder="9876543210"/>
+      </div>
+      <button class="btn btn-full" id="sendOtpBtn" onclick="goToOtp()">Send OTP →</button>
+      <div class="terms">By continuing, you agree to our Terms of Service and Privacy Policy</div>
+    </div>
+    <div id="otpStep" style="display:none">
+      <div class="otp-row" id="otpRow"></div>
+      <button class="btn btn-full" id="verifyBtn" onclick="launchApp()">Verify & Continue</button>
+      <div class="resend-row">Resend OTP in <strong>30s</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo-mark">✂️</div>
+      <div class="sb-logo-text">BarberBook</div>
+    </div>
+    <div class="role-switcher">
+      <button class="rsw-btn active" id="rswBarber" onclick="switchRole('barber')">✂️ Barber</button>
+      <button class="rsw-btn" id="rswCustomer" onclick="switchRole('customer')">👤 Customer</button>
+    </div>
+    <div class="sb-section" id="sbSection">Barber Menu</div>
+    <nav class="sb-nav" id="barberNav">
+      <button class="nav-btn active-green" data-page="bHome"><span class="nav-icon">🏠</span><span>Dashboard</span></button>
+      <button class="nav-btn" data-page="bAppts"><span class="nav-icon">📅</span><span>Appointments</span></button>
+      <button class="nav-btn" data-page="bAvail"><span class="nav-icon">🕐</span><span>Availability</span></button>
+      <button class="nav-btn" data-page="bEarn"><span class="nav-icon">💰</span><span>Earnings</span></button>
+      <button class="nav-btn" data-page="bProfile"><span class="nav-icon">👤</span><span>Profile</span></button>
+    </nav>
+    <nav class="sb-nav" id="customerNav" style="display:none">
+      <button class="nav-btn" data-page="cHome"><span class="nav-icon">🏠</span><span>Discover</span></button>
+      <button class="nav-btn" data-page="cBookings"><span class="nav-icon">📋</span><span>Bookings</span></button>
+      <button class="nav-btn" data-page="cNotifs"><span class="nav-icon">🔔</span><span>Alerts</span><span class="notif-dot" id="notifDot">3</span></button>
+      <button class="nav-btn" data-page="cFavs"><span class="nav-icon">❤️</span><span>Favourites</span></button>
+      <button class="nav-btn" data-page="cProfile"><span class="nav-icon">👤</span><span>Profile</span></button>
+    </nav>
+    <div class="sb-footer">
+      <button class="nav-btn" style="color:var(--red);width:100%" onclick="doLogout()"><span class="nav-icon">🚪</span><span>Log out</span></button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- BARBER PAGES -->
+    <div class="page active" id="bHome"></div>
+    <div class="page" id="bAppts"></div>
+    <div class="page" id="bAvail"></div>
+    <div class="page" id="bEarn"></div>
+    <div class="page" id="bProfile"></div>
+    <!-- CUSTOMER PAGES -->
+    <div class="page" id="cHome"></div>
+    <div class="page" id="cBookings"></div>
+    <div class="page" id="cNotifs"></div>
+    <div class="page" id="cFavs"></div>
+    <div class="page" id="cProfile"></div>
+  </div>
+</div>
+
+<!-- STATUS SHEET -->
+<div class="overlay" id="statusOverlay" onclick="if(event.target===this)closeOverlay('statusOverlay')">
+  <div class="sheet">
+    <div class="sheet-title">Set Your Status</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-full" style="background:var(--green);color:#fff;justify-content:flex-start;gap:12px" onclick="setStatus('open')">🟢 Open — Accepting bookings</button>
+      <button class="btn btn-full" style="background:var(--red);color:#fff;justify-content:flex-start;gap:12px" onclick="setStatus('busy')">🔴 Busy — With a customer</button>
+      <button class="btn btn-full" style="background:var(--amber);color:#fff;justify-content:flex-start;gap:12px" onclick="setStatus('break')">🟡 On Break</button>
+    </div>
+    <button class="btn btn-outline btn-full" style="margin-top:14px" onclick="closeOverlay('statusOverlay')">Cancel</button>
+  </div>
+</div>
+
+<!-- BOOKING SHEET -->
+<div class="overlay" id="bookingOverlay" onclick="if(event.target===this)closeOverlay('bookingOverlay')">
+  <div class="sheet" style="max-height:90vh;overflow-y:auto">
+    <div id="bookingContent"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="dialog-overlay" id="confirmOverlay" onclick="if(event.target===this)closeOverlay('confirmOverlay')">
+  <div class="dialog">
+    <div style="font-size:18px;font-weight:800;margin-bottom:8px" id="confirmTitle">Confirm</div>
+    <div style="font-size:14px;color:var(--grey);margin-bottom:20px" id="confirmMsg"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeOverlay('confirmOverlay')">Cancel</button>
+      <button class="btn" style="flex:1" id="confirmBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon">✅</div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:8px">Booking Confirmed!</div>
+    <div style="font-size:14px;color:var(--grey);margin-bottom:24px">Your appointment has been booked successfully.</div>
+    <button class="btn btn-green btn-full" onclick="closeOverlay('successOverlay');goTo('cBookings')">View Bookings</button>
+  </div>
+</div>
+
+<!-- SNACKBAR -->
+<div class="snack" id="snackbar"></div>
+
+<script>
+// ── STATE ──
+const ST = {
+  role: 'barber',
+  barberStatus: 'open',
+  curPage: 'bHome',
+  favs: ['b2'],
+  bookingStep: 1,
+  bookingSel: { service: null, date: null, time: null },
+  bookingBarber: null,
+  apptTab: 'today',
+  bookingTab: 'upcoming',
+  notifRead: []
+};
+
+// ── MOCK DATA ──
+const BARBERS = [
+  { id:'b1', name:'Raj Kumar', shop:'Royal Cuts Studio', specialty:'Fades & Beard', rating:4.9, reviews:128, exp:7, price:350, dist:'1.2 km', isOpen:true, initial:'R',
+    services:[{icon:'✂️',name:'Classic Haircut',duration:'30 min',price:250},{icon:'🧔',name:'Beard Trim & Shape',duration:'20 min',price:150},{icon:'💈',name:'Fade + Beard Combo',duration:'45 min',price:350},{icon:'🪒',name:'Head Shave',duration:'25 min',price:200}] },
+  { id:'b2', name:'Arjun Mehta', shop:'The Gentleman Barber', specialty:'Modern Styles', rating:4.8, reviews:94, exp:5, price:400, dist:'0.8 km', isOpen:true, initial:'A',
+    services:[{icon:'✂️',name:'Modern Haircut',duration:'35 min',price:300},{icon:'🎨',name:'Hair Colour',duration:'60 min',price:600},{icon:'💆',name:'Head Massage',duration:'20 min',price:200},{icon:'💈',name:'Full Grooming',duration:'75 min',price:800}] },
+  { id:'b3', name:'Kiran Dass', shop:'Classic Barbers', specialty:'Traditional Cuts', rating:4.7, reviews:201, exp:12, price:180, dist:'2.1 km', isOpen:false, initial:'K',
+    services:[{icon:'✂️',name:'Regular Cut',duration:'20 min',price:120},{icon:'🪒',name:'Straight Shave',duration:'30 min',price:180},{icon:'🧴',name:'Hair Treatment',duration:'40 min',price:250}] },
+  { id:'b4', name:'Suresh Nair', shop:'Prestige Grooming', specialty:'Premium Styles', rating:4.6, reviews:67, exp:8, price:500, dist:'3.4 km', isOpen:true, initial:'S',
+    services:[{icon:'✂️',name:'Premium Haircut',duration:'45 min',price:450},{icon:'🧔',name:'Beard Sculpting',duration:'30 min',price:300},{icon:'💆',name:'Scalp Treatment',duration:'50 min',price:500}] }
+];
+
+const APPOINTMENTS = [
+  { id:'a1', customer:'Rahul S.', service:'Classic Haircut', time:'9:00 AM', date:'Today', price:250, status:'confirmed', initial:'RS' },
+  { id:'a2', customer:'Vikram P.', service:'Fade + Beard Combo', time:'10:30 AM', date:'Today', price:350, status:'pending', initial:'VP' },
+  { id:'a3', customer:'Ankit M.', service:'Beard Trim', time:'12:00 PM', date:'Today', price:150, status:'confirmed', initial:'AM' },
+  { id:'a4', customer:'Deepak R.', service:'Head Shave', time:'2:00 PM', date:'Today', price:200, status:'pending', initial:'DR' },
+  { id:'a5', customer:'Sanjay T.', service:'Classic Haircut', time:'9:00 AM', date:'Tomorrow', price:250, status:'confirmed', initial:'ST' },
+  { id:'a6', customer:'Manish K.', service:'Fade + Beard Combo', time:'11:00 AM', date:'Tomorrow', price:350, status:'confirmed', initial:'MK' }
+];
+
+const MY_BOOKINGS = [
+  { id:'mb1', barber:'Raj Kumar', shop:'Royal Cuts Studio', service:'Classic Haircut', time:'10:30 AM', date:'Mon, Apr 7', price:250, status:'upcoming' },
+  { id:'mb2', barber:'Arjun Mehta', shop:'The Gentleman Barber', service:'Modern Haircut', time:'3:00 PM', date:'Thu, Apr 10', price:300, status:'upcoming' },
+  { id:'mb3', barber:'Kiran Dass', shop:'Classic Barbers', service:'Regular Cut', time:'11:00 AM', date:'Sat, Mar 29', price:120, status:'completed' },
+  { id:'mb4', barber:'Raj Kumar', shop:'Royal Cuts Studio', service:'Beard Trim', time:'4:00 PM', date:'Mon, Mar 17', price:150, status:'completed' }
+];
+
+const NOTIFS = [
+  { id:'n1', icon:'📅', bg:'var(--green-tint)', title:'Booking Confirmed', msg:'Your haircut with Raj Kumar is confirmed for Mon Apr 7 at 10:30 AM.', time:'2h ago', read:false },
+  { id:'n2', icon:'⏰', bg:'var(--amber-tint)', title:'Appointment Reminder', msg:'You have an appointment tomorrow at 10:30 AM with Raj Kumar.', time:'5h ago', read:false },
+  { id:'n3', icon:'🎉', bg:'var(--purple-tint)', title:'Special Offer', msg:'Get 50% off your next haircut! Use code FIRST50 at checkout.', time:'1d ago', read:false },
+  { id:'n4', icon:'✅', bg:'var(--green-tint)', title:'Booking Completed', msg:'Your appointment with Kiran Dass has been marked as completed.', time:'3d ago', read:true },
+  { id:'n5', icon:'⭐', bg:'var(--amber-tint)', title:'Rate Your Experience', msg:'How was your visit to Classic Barbers? Leave a review!', time:'4d ago', read:true }
+];
+
+const SCHEDULE = [
+  { day:'Monday', enabled:true, from:'9:00 AM', to:'7:00 PM' },
+  { day:'Tuesday', enabled:true, from:'9:00 AM', to:'7:00 PM' },
+  { day:'Wednesday', enabled:true, from:'9:00 AM', to:'7:00 PM' },
+  { day:'Thursday', enabled:true, from:'9:00 AM', to:'7:00 PM' },
+  { day:'Friday', enabled:true, from:'9:00 AM', to:'8:00 PM' },
+  { day:'Saturday', enabled:true, from:'10:00 AM', to:'6:00 PM' },
+  { day:'Sunday', enabled:false, from:'—', to:'—' }
+];
+
+// ── HELPERS ──
+function snack(msg) {
+  const el = document.getElementById('snackbar');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+function openOverlay(id) { document.getElementById(id).classList.add('show'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+function greet() { const h=new Date().getHours(); return h<12?'morning':h<17?'afternoon':'evening'; }
+function statusColor(s) { return {open:'var(--green)',busy:'var(--red)',break:'var(--amber)'}[s]||'var(--green)'; }
+function statusLabel(s) { return {open:'Open — Accepting bookings',busy:'Busy — With a customer',break:'On Break'}[s]||''; }
+
+// ── SPLASH → ROLE ──
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('fade');
+    setTimeout(showRole, 500);
+  }, 1800);
+});
+
+function showRole() {
+  document.getElementById('authScreen').classList.remove('show');
+  document.getElementById('roleScreen').classList.add('show');
+}
+
+function chooseRole(r) {
+  ST.role = r;
+  const isB = r === 'barber';
+  const color = isB ? 'var(--green)' : 'var(--purple)';
+  document.getElementById('authIconWrap').textContent = isB ? '✂️' : '👤';
+  document.getElementById('authIconWrap').style.background = isB ? 'var(--green-tint)' : 'var(--purple-tint)';
+  document.getElementById('authTitle').textContent = isB ? 'Barber Login' : 'Customer Login';
+  document.getElementById('authSub').textContent = "Enter your mobile number to receive a verification code.";
+  document.getElementById('sendOtpBtn').style.background = isB ? 'var(--green)' : 'var(--purple)';
+  document.getElementById('sendOtpBtn').style.color = '#fff';
+  document.getElementById('verifyBtn').style.background = isB ? 'var(--green)' : 'var(--purple)';
+  document.getElementById('verifyBtn').style.color = '#fff';
+  document.getElementById('phoneStep').style.display = 'block';
+  document.getElementById('otpStep').style.display = 'none';
+  document.getElementById('roleScreen').classList.remove('show');
+  document.getElementById('authScreen').classList.add('show');
+}
+
+function goToOtp() {
+  const ph = document.getElementById('phoneInput').value.trim();
+  if (!ph) { snack('Enter a phone number'); return; }
+  document.getElementById('phoneStep').style.display = 'none';
+  document.getElementById('otpStep').style.display = 'block';
+  document.getElementById('authTitle').textContent = 'Verify OTP';
+  document.getElementById('authSub').innerHTML = `Code sent to <strong>+91 ${ph}</strong>`;
+  buildOtpBoxes();
+}
+
+function buildOtpBoxes() {
+  const row = document.getElementById('otpRow'); row.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const inp = document.createElement('input');
+    inp.className = 'otp-box'; inp.maxLength = 1; inp.type = 'tel';
+    inp.addEventListener('input', () => { if(inp.value && i<5) row.children[i+1].focus(); });
+    inp.addEventListener('keydown', e => { if(e.key==='Backspace'&&!inp.value&&i>0) row.children[i-1].focus(); });
+    row.appendChild(inp);
+  }
+  row.children[0].focus();
+}
+
+// ── LAUNCH APP ──
+function launchApp() {
+  document.getElementById('authScreen').classList.remove('show');
+  document.getElementById('app').style.display = 'flex';
+  setupSidebar();
+  goTo(ST.role === 'barber' ? 'bHome' : 'cHome');
+}
+
+function setupSidebar() {
+  const isB = ST.role === 'barber';
+  document.getElementById('barberNav').style.display = isB ? 'flex' : 'none';
+  document.getElementById('customerNav').style.display = isB ? 'none' : 'flex';
+  document.getElementById('sbSection').textContent = isB ? 'Barber Menu' : 'Customer Menu';
+  document.getElementById('rswBarber').className = 'rsw-btn' + (isB ? ' active' : '');
+  document.getElementById('rswCustomer').className = 'rsw-btn' + (!isB ? ' active' : '');
+  document.querySelectorAll('.nav-btn[data-page]').forEach(btn => btn.onclick = () => goTo(btn.dataset.page));
+}
+
+function goTo(pageId) {
+  ST.curPage = pageId;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  const isB = pageId.startsWith('b');
+  const navId = isB ? 'barberNav' : 'customerNav';
+  const cls = isB ? 'active-green' : 'active-purple';
+  document.querySelectorAll(`#${navId} .nav-btn`).forEach(b => b.classList.remove('active-green','active-purple'));
+  const active = document.querySelector(`#${navId} [data-page="${pageId}"]`);
+  if (active) active.classList.add(cls);
+  renderPage();
+}
+
+function renderPage() {
+  const map = { bHome:renderBarberHome, bAppts:renderAllAppts, bAvail:renderAvail, bEarn:renderEarnings, bProfile:renderBarberProfile, cHome:renderCustomerHome, cBookings:renderMyBookings, cNotifs:renderNotifs, cFavs:renderFavourites, cProfile:renderCustomerProfile };
+  map[ST.curPage]?.();
+}
+
+function switchRole(r) {
+  ST.role = r;
+  document.getElementById('rswBarber').className = 'rsw-btn' + (r==='barber'?' active':'');
+  document.getElementById('rswCustomer').className = 'rsw-btn' + (r==='customer'?' active':'');
+  document.getElementById('barberNav').style.display = r==='barber'?'flex':'none';
+  document.getElementById('customerNav').style.display = r==='customer'?'flex':'none';
+  document.getElementById('sbSection').textContent = r==='barber'?'Barber Menu':'Customer Menu';
+  goTo(r==='barber'?'bHome':'cHome');
+}
+
+function doLogout() {
+  confirm2('Log Out','Are you sure you want to log out?','Log Out','var(--red)',()=>{
+    document.getElementById('app').style.display = 'none';
+    showRole();
+  });
+}
+
+// ── BARBER HOME ──
+function renderBarberHome() {
+  const todayAppts = APPOINTMENTS.filter(a => a.date === 'Today');
+  const confirmed = todayAppts.filter(a => a.status==='confirmed').length;
+  const pending = todayAppts.filter(a => a.status==='pending').length;
+  const earnings = todayAppts.reduce((s,a) => s+a.price, 0);
+  const sc = statusColor(ST.barberStatus);
+  document.getElementById('bHome').innerHTML = `
+  <div class="page-header">
+    <div>
+      <div style="font-size:13px;color:var(--grey)">Good ${greet()},</div>
+      <div class="page-title">Raj Kumar ✂️</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="icon-btn" onclick="goTo('bAppts')">🔔</button>
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--green-tint);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:var(--green)">R</div>
+    </div>
+  </div>
+  <button class="status-banner" style="background:${sc}" onclick="openOverlay('statusOverlay')">
+    <div class="status-dot-box">●</div>
+    <div style="flex:1;margin-left:2px">
+      <div style="font-size:15px;font-weight:700;color:#fff">Status: ${ST.barberStatus.charAt(0).toUpperCase()+ST.barberStatus.slice(1)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.72)">${statusLabel(ST.barberStatus)}</div>
+    </div>
+    <span style="color:#fff;font-size:20px">⌄</span>
+  </button>
+  <div class="stat-row">
+    <div class="stat-card"><div style="font-size:18px">📅</div><div class="stat-val" style="color:var(--green)">${todayAppts.length}</div><div class="stat-lbl">appointments</div></div>
+    <div class="stat-card"><div style="font-size:18px">✅</div><div class="stat-val" style="color:var(--green)">${confirmed}</div><div class="stat-lbl">confirmed</div></div>
+    <div class="stat-card"><div style="font-size:18px">⏳</div><div class="stat-val" style="color:var(--amber)">${pending}</div><div class="stat-lbl">pending</div></div>
+  </div>
+  <div class="card-sm" style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+    <span style="font-size:24px;color:var(--green)">₹</span>
+    <div>
+      <div style="font-size:12px;color:var(--grey)">Today's earnings</div>
+      <div style="font-size:24px;font-weight:800;color:var(--green)">₹${earnings}</div>
+    </div>
+    <span style="margin-left:auto;font-size:12px;color:var(--grey)">Royal Cuts Studio</span>
+  </div>
+  <div class="sec-hdr"><span class="sec-title">Today's Schedule</span><span class="sec-count">Mon, Apr 7</span></div>
+  ${todayAppts.map(a => apptCard(a, true)).join('')}`;
+}
+
+function apptCard(a, isBarber) {
+  const statusBadge = { confirmed:'badge-green', pending:'badge-amber', cancelled:'badge-red', completed:'badge-grey' };
+  return `<div class="appt-card">
+    <div class="appt-row">
+      <div class="appt-avatar">${a.initial||a.customer?.slice(0,2)||'?'}</div>
+      <div class="appt-divider"></div>
+      <div class="appt-info">
+        <div style="font-size:14px;font-weight:700">${isBarber ? a.customer : a.barber||a.customer}</div>
+        <div style="font-size:12px;color:var(--grey)">${a.service} · ${a.time}</div>
+        <div style="font-size:12px;color:var(--grey)">${a.date}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="badge ${statusBadge[a.status]||'badge-grey'}">${a.status}</span>
+        <div style="font-size:14px;font-weight:700;color:var(--green);margin-top:4px">₹${a.price}</div>
+      </div>
+    </div>
+    ${isBarber && a.status==='pending' ? `<div class="appt-actions">
+      <button class="btn btn-green btn-sm" style="flex:1" onclick="confirmAppt('${a.id}')">✓ Confirm</button>
+      <button class="btn btn-red-outline btn-sm" style="flex:1" onclick="cancelAppt('${a.id}')">✕ Cancel</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function setStatus(s) { ST.barberStatus = s; closeOverlay('statusOverlay'); renderBarberHome(); snack('Status updated'); }
+function confirmAppt(id) { snack('Appointment confirmed ✓'); }
+function cancelAppt(id) { confirm2('Cancel Appointment','Are you sure you want to cancel this appointment?','Cancel It','var(--red)',()=>snack('Appointment cancelled')); }
+
+// ── BARBER APPOINTMENTS ──
+function renderAllAppts() {
+  const tabs = ['today','tomorrow','all'];
+  const filtered = ST.apptTab==='today' ? APPOINTMENTS.filter(a=>a.date==='Today') : ST.apptTab==='tomorrow' ? APPOINTMENTS.filter(a=>a.date==='Tomorrow') : APPOINTMENTS;
+  document.getElementById('bAppts').innerHTML = `
+  <div class="page-header"><div class="page-title">Appointments</div><span class="badge badge-green">${APPOINTMENTS.length} total</span></div>
+  <div class="tab-bar">
+    <button class="tab-btn ${ST.apptTab==='today'?'active':''}" onclick="ST.apptTab='today';renderAllAppts()">Today (${APPOINTMENTS.filter(a=>a.date==='Today').length})</button>
+    <button class="tab-btn ${ST.apptTab==='tomorrow'?'active':''}" onclick="ST.apptTab='tomorrow';renderAllAppts()">Tomorrow (${APPOINTMENTS.filter(a=>a.date==='Tomorrow').length})</button>
+    <button class="tab-btn ${ST.apptTab==='all'?'active':''}" onclick="ST.apptTab='all';renderAllAppts()">All</button>
+  </div>
+  ${filtered.length ? filtered.map(a=>apptCard(a,true)).join('') : '<div class="empty-state"><div class="empty-icon">📅</div><div>No appointments</div></div>'}`;
+}
+
+// ── BARBER AVAILABILITY ──
+function renderAvail() {
+  document.getElementById('bAvail').innerHTML = `
+  <div class="page-header"><div class="page-title">Availability</div><button class="btn btn-green btn-sm" onclick="snack('Schedule saved ✓')">Save</button></div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">Working Hours</div>
+    ${SCHEDULE.map((d,i)=>`
+    <div class="avail-row">
+      <div class="avail-day">${d.day}</div>
+      <div class="avail-time">${d.enabled ? `${d.from} – ${d.to}` : 'Closed'}</div>
+      <label class="toggle"><input type="checkbox" ${d.enabled?'checked':''} onchange="SCHEDULE[${i}].enabled=this.checked;renderAvail()"/><div class="toggle-track"></div></label>
+    </div>`).join('')}
+  </div>
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">Slot Duration</div>
+    <div class="field"><label>Appointment slot length</label>
+      <select><option>30 minutes</option><option>45 minutes</option><option selected>60 minutes</option></select>
+    </div>
+    <div class="field"><label>Break between appointments</label>
+      <select><option selected>5 minutes</option><option>10 minutes</option><option>15 minutes</option></select>
+    </div>
+  </div>`;
+}
+
+// ── BARBER EARNINGS ──
+function renderEarnings() {
+  const weeks = [['Mon',820],['Tue',650],['Wed',1100],['Thu',480],['Fri',1400],['Sat',1850],['Sun',0]];
+  const maxVal = Math.max(...weeks.map(w=>w[1]));
+  document.getElementById('bEarn').innerHTML = `
+  <div class="page-header"><div class="page-title">Earnings</div><span class="badge badge-green">This week</span></div>
+  <div class="earnings-card">
+    <div style="font-size:13px;color:rgba(255,255,255,.72)">Total this week</div>
+    <div class="earnings-total">₹6,300</div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.72);margin-bottom:8px">
+      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+    </div>
+    <div class="bar-chart">
+      ${weeks.map(([l,v])=>`<div class="bar-col">
+        <div class="bar-fill" style="height:${maxVal?Math.round((v/maxVal)*90):0}px"></div>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="stat-row" style="margin-bottom:16px">
+    <div class="stat-card"><div style="font-size:18px">👥</div><div class="stat-val" style="color:var(--green)">18</div><div class="stat-lbl">clients</div></div>
+    <div class="stat-card"><div style="font-size:18px">⭐</div><div class="stat-val" style="color:var(--amber)">4.9</div><div class="stat-lbl">avg rating</div></div>
+    <div class="stat-card"><div style="font-size:18px">📈</div><div class="stat-val" style="color:var(--purple)">+12%</div><div class="stat-lbl">vs last week</div></div>
+  </div>
+  <div class="sec-hdr"><span class="sec-title">Recent Transactions</span></div>
+  ${APPOINTMENTS.filter(a=>a.status!=='cancelled').map(a=>`
+  <div class="card-sm" style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+    <div class="appt-avatar">${a.initial}</div>
+    <div style="flex:1"><div style="font-size:14px;font-weight:600">${a.customer}</div><div style="font-size:12px;color:var(--grey)">${a.service} · ${a.time}</div></div>
+    <div style="font-size:16px;font-weight:800;color:var(--green)">+₹${a.price}</div>
+  </div>`).join('')}`;
+}
+
+// ── BARBER PROFILE ──
+function renderBarberProfile() {
+  document.getElementById('bProfile').innerHTML = `
+  <div class="page-header"><div class="page-title">Profile</div><button class="btn btn-green btn-sm" onclick="snack('Profile saved ✓')">Save</button></div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--green-tint);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800">R</div>
+      <div>
+        <div style="font-size:18px;font-weight:800">Raj Kumar</div>
+        <div style="font-size:13px;color:var(--grey)">+91 98765 43210</div>
+        <span class="badge badge-green" style="margin-top:6px">⭐ 4.9 · 128 reviews</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center;border-top:1px solid var(--border);padding-top:14px">
+      ${[['Clients','247'],['This Week','18'],['Earnings','₹6,300']].map(([l,v])=>`<div><div style="font-size:18px;font-weight:800;color:var(--green)">${v}</div><div style="font-size:11px;color:var(--grey)">${l}</div></div>`).join('')}
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">Shop Info</div>
+    <div class="field"><label>Full Name</label><input value="Raj Kumar"/></div>
+    <div class="field"><label>Shop Name</label><input value="Royal Cuts Studio"/></div>
+    <div class="field"><label>Specialty</label><input value="Fades & Beard Styling"/></div>
+    <div class="field"><label>Location</label><input value="Anna Nagar, Chennai"/></div>
+    <div class="field"><label>Bio</label><textarea rows="3">Professional barber with 7 years of experience specializing in modern fades and beard sculpting.</textarea></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">Services</div>
+    ${BARBERS[0].services.map(s=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:20px">${s.icon}</div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:600">${s.name}</div><div style="font-size:12px;color:var(--grey)">${s.duration}</div></div>
+      <div style="font-size:14px;font-weight:700;color:var(--green)">₹${s.price}</div>
+    </div>`).join('')}
+  </div>
+  <button class="btn btn-red-outline btn-full" onclick="doLogout()">🚪 Log Out</button>`;
+}
+
+// ── CUSTOMER HOME ──
+let cHomeView = 'list';
+let selectedBarber = null;
+let bookStep = 1;
+let bookSel = { service: null, date: null, time: null };
+
+function renderCustomerHome() {
+  if (selectedBarber) { renderBarberDetail(); return; }
+  const pills = ['All','Nearby','Top Rated','Budget','Premium'];
+  document.getElementById('cHome').innerHTML = `
+  <div class="page-header">
+    <div>
+      <div style="font-size:13px;color:var(--grey)">Good ${greet()},</div>
+      <div class="page-title">Find a Barber 💈</div>
+    </div>
+    <div style="width:44px;height:44px;border-radius:50%;background:var(--purple-tint);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:var(--purple)">U</div>
+  </div>
+  <div class="promo-banner">
+    <div>
+      <div style="font-size:13px;color:rgba(255,255,255,.8)">First booking?</div>
+      <div style="font-size:18px;font-weight:800;color:#fff">50% off with FIRST50</div>
+    </div>
+    <button class="promo-claim" onclick="snack('Code FIRST50 copied! 🎉')">Claim →</button>
+  </div>
+  <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" placeholder="Search barbers, shops…"/></div>
+  <div class="filter-row">${pills.map((p,i)=>`<button class="filter-pill ${i===0?'on':''}" onclick="selectPill(this)">${p}</button>`).join('')}</div>
+  <div class="sec-hdr"><span class="sec-title">Available Barbers</span><span class="sec-count">${BARBERS.length} nearby</span></div>
+  ${BARBERS.map(b=>barberCardHTML(b)).join('')}`;
+}
+
+function selectPill(el) {
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function barberCardHTML(b) {
+  const isFav = ST.favs.includes(b.id);
+  return `<div class="barber-card" onclick="openBarber('${b.id}')">
+    <div class="barber-avatar">
+      ${b.initial}
+      <div class="online-indicator" style="background:${b.isOpen?'var(--green)':'var(--grey)'}"></div>
+    </div>
+    <div class="barber-info">
+      <div class="barber-name">${b.name}</div>
+      <div class="barber-shop">${b.shop}</div>
+      <div class="barber-meta">
+        <span>⭐ ${b.rating}</span><span>·</span><span>${b.reviews} reviews</span><span>·</span><span>${b.dist}</span>
+      </div>
+      <div class="barber-footer">
+        <span class="barber-price">From ₹${b.price}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge ${b.isOpen?'badge-green':'badge-grey'}">${b.isOpen?'Open':'Closed'}</span>
+          <button class="fav-btn" onclick="event.stopPropagation();toggleFav('${b.id}',this)">${isFav?'❤️':'🤍'}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openBarber(id) {
+  selectedBarber = BARBERS.find(b=>b.id===id);
+  bookStep = 1;
+  bookSel = { service:null, date:null, time:null };
+  renderCustomerHome();
+}
+
+function renderBarberDetail() {
+  const b = selectedBarber;
+  const isFav = ST.favs.includes(b.id);
+  document.getElementById('cHome').innerHTML = `
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+    <button class="auth-back" style="margin-bottom:0" onclick="selectedBarber=null;renderCustomerHome()">←</button>
+    <div class="page-title">${b.name}</div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;gap:16px;align-items:center">
+      <div class="barber-avatar" style="width:72px;height:72px;font-size:28px">${b.initial}
+        <div class="online-indicator" style="background:${b.isOpen?'var(--green)':'var(--grey)'}"></div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:800">${b.name}</div>
+        <div style="font-size:13px;color:var(--grey)">${b.shop}</div>
+        <div style="font-size:13px;color:var(--grey);margin-top:4px">${b.specialty} · ${b.exp} yrs exp</div>
+        <div class="barber-meta" style="margin-top:8px">
+          <span>⭐ ${b.rating}</span><span>·</span><span>${b.reviews} reviews</span><span>·</span><span>${b.dist}</span>
+        </div>
+      </div>
+      <button class="fav-btn" style="font-size:24px" onclick="toggleFav('${b.id}',this)">${isFav?'❤️':'🤍'}</button>
+    </div>
+  </div>
+  <!-- BOOKING STEPS -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="steps-row">
+      ${['Service','Date & Time','Confirm'].map((s,i)=>{
+        const n=i+1; const done=bookStep>n; const active=bookStep===n;
+        return `<div class="step-col">
+          <div style="display:flex;align-items:center;width:100%">
+            <div class="step-circle" style="background:${done||active?'var(--purple)':'var(--border)'};color:${done||active?'#fff':'var(--grey)'}">${done?'✓':n}</div>
+            ${i<2?`<div class="step-line" style="background:${done?'var(--purple)':'var(--border)'}"></div>`:''}
+          </div>
+          <div class="step-name" style="color:${active?'var(--purple)':'var(--grey)'}">${s}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${bookStep===1 ? renderServiceStep(b) : bookStep===2 ? renderDateTimeStep() : renderConfirmStep(b)}
+  </div>`;
+}
+
+function renderServiceStep(b) {
+  return `<div style="font-size:15px;font-weight:700;margin-bottom:14px">Choose a service</div>
+  ${b.services.map((s,i)=>`<div class="service-row ${bookSel.service===i?'sel':''}" onclick="bookSel.service=${i};renderCustomerHome()">
+    <div class="service-icon" style="background:var(--purple-tint)">${s.icon}</div>
+    <div style="flex:1"><div style="font-size:14px;font-weight:700">${s.name}</div><div style="font-size:12px;color:var(--grey)">${s.duration}</div></div>
+    <div style="font-size:16px;font-weight:800;color:var(--purple)">₹${s.price}</div>
+    ${bookSel.service===i?'<span style="color:var(--purple);font-size:18px">✓</span>':''}
+  </div>`).join('')}
+  <button class="btn btn-purple btn-full" style="margin-top:14px" ${bookSel.service===null?'disabled':''} onclick="bookStep=2;renderCustomerHome()">Next: Pick Date & Time →</button>`;
+}
+
+const TIMES = ['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM'];
+const BOOKED_TIMES = ['10:00 AM','11:30 AM','1:30 PM'];
+
+function selectTimeSlot(t, booked) {
+  if (booked) return;
+  bookSel.time = t;
+  renderCustomerHome();
+}
+
+function renderDateTimeStep() {
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dates = Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()+i);return d;});
+  return `<div style="font-size:15px;font-weight:700;margin-bottom:14px">Pick date & time</div>
+  <div class="date-scroll">
+    ${dates.map((d,i)=>{
+      const key=d.toDateString();
+      return `<div class="date-chip ${bookSel.date===key?'active':''}" onclick="bookSel.date='${key}';renderCustomerHome()">
+        <div style="font-size:10px;font-weight:600;color:${bookSel.date===key?'rgba(255,255,255,.7)':'var(--grey)'}">${days[d.getDay()]}</div>
+        <div style="font-size:20px;font-weight:800;color:${bookSel.date===key?'#fff':'var(--dark)'}">${d.getDate()}</div>
+        <div style="font-size:10px;color:${bookSel.date===key?'rgba(255,255,255,.7)':'var(--grey)'}">${months[d.getMonth()]}</div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div style="font-size:14px;font-weight:700;margin-bottom:12px">Available slots</div>
+  <div class="time-grid">
+    ${TIMES.map(t=>{
+      const booked=BOOKED_TIMES.includes(t);
+      const active=bookSel.time===t;
+      return `<div class="time-chip ${booked?'booked':active?'active':''}" onclick="selectTimeSlot('${t}',${booked})">${t}</div>`;
+    }).join('')}
+  </div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn btn-outline" style="flex:1" onclick="bookStep=1;renderCustomerHome()">← Back</button>
+    <button class="btn btn-purple" style="flex:1" ${!bookSel.date||!bookSel.time?'disabled':''} onclick="bookStep=3;renderCustomerHome()">Next: Confirm →</button>
+  </div>`;
+}
+
+function renderConfirmStep(b) {
+  const svc = b.services[bookSel.service];
+  const d = new Date(bookSel.date||Date.now());
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dateStr = bookSel.date ? `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}` : '—';
+  return `<div style="font-size:15px;font-weight:700;margin-bottom:14px">Confirm booking</div>
+  <div class="card" style="margin-bottom:16px;padding:16px">
+    <div class="conf-row"><span class="conf-key">Barber</span><span class="conf-val">${b.name}</span></div>
+    <div class="conf-row"><span class="conf-key">Service</span><span class="conf-val">${svc?.name||'—'}</span></div>
+    <div class="conf-row"><span class="conf-key">Date</span><span class="conf-val">${dateStr}</span></div>
+    <div class="conf-row"><span class="conf-key">Time</span><span class="conf-val">${bookSel.time||'—'}</span></div>
+    <div class="conf-row"><span class="conf-key">Duration</span><span class="conf-val">${svc?.duration||'—'}</span></div>
+    <div class="conf-row"><span class="conf-key">Total</span><span class="conf-val" style="color:var(--green);font-size:16px">₹${svc?.price||0}</span></div>
+  </div>
+  <div class="card" style="margin-bottom:14px;padding:14px;background:var(--purple-tint);border-color:var(--purple)">
+    <div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px">🎟 Apply Promo Code</div>
+    <div style="display:flex;gap:8px"><input placeholder="Enter code" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13px;outline:none"/><button class="btn btn-purple btn-sm" onclick="snack('Code applied! ₹125 off 🎉')">Apply</button></div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-outline" style="flex:1" onclick="bookStep=2;renderCustomerHome()">← Back</button>
+    <button class="btn btn-purple" style="flex:1" onclick="confirmBooking()">Confirm Booking ✓</button>
+  </div>`;
+}
+
+function confirmBooking() {
+  selectedBarber = null;
+  bookStep = 1;
+  bookSel = { service:null, date:null, time:null };
+  openOverlay('successOverlay');
+}
+
+function toggleFav(id, btn) {
+  if (ST.favs.includes(id)) { ST.favs = ST.favs.filter(f=>f!==id); btn.textContent='🤍'; snack('Removed from favourites'); }
+  else { ST.favs.push(id); btn.textContent='❤️'; snack('Added to favourites ❤️'); }
+}
+
+// ── CUSTOMER BOOKINGS ──
+function renderMyBookings() {
+  const upcoming = MY_BOOKINGS.filter(b=>b.status==='upcoming');
+  const past = MY_BOOKINGS.filter(b=>b.status!=='upcoming');
+  const tab = ST.bookingTab || 'upcoming';
+  const list = tab==='upcoming' ? upcoming : past;
+  document.getElementById('cBookings').innerHTML = `
+  <div class="page-header"><div class="page-title">My Bookings</div></div>
+  <div class="tab-bar">
+    <button class="tab-btn ${tab==='upcoming'?'active':''}" onclick="ST.bookingTab='upcoming';renderMyBookings()">Upcoming (${upcoming.length})</button>
+    <button class="tab-btn ${tab==='history'?'active':''}" onclick="ST.bookingTab='history';renderMyBookings()">History (${past.length})</button>
+  </div>
+  ${list.length ? list.map(b=>`<div class="appt-card">
+    <div class="appt-row">
+      <div class="appt-avatar" style="background:var(--purple-tint);color:var(--purple)">${b.barber[0]}</div>
+      <div class="appt-divider"></div>
+      <div class="appt-info">
+        <div style="font-size:14px;font-weight:700">${b.barber}</div>
+        <div style="font-size:12px;color:var(--grey)">${b.service}</div>
+        <div style="font-size:12px;color:var(--grey)">📅 ${b.date} at ${b.time}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="badge ${b.status==='upcoming'?'badge-purple':'badge-grey'}">${b.status}</span>
+        <div style="font-size:14px;font-weight:700;color:var(--green);margin-top:4px">₹${b.price}</div>
+      </div>
+    </div>
+    ${b.status==='upcoming'?`<div class="appt-actions">
+      <button class="btn btn-purple btn-sm" style="flex:1" onclick="snack('Reschedule feature coming soon!')">📅 Reschedule</button>
+      <button class="btn btn-red-outline btn-sm" style="flex:1" onclick="confirm2('Cancel Booking','Cancel this appointment?','Yes, Cancel','var(--red)',()=>snack('Booking cancelled'))">✕ Cancel</button>
+    </div>`:b.status==='completed'?`<div class="appt-actions"><button class="btn btn-outline btn-sm btn-full" onclick="snack('Review submitted ⭐')">⭐ Leave a Review</button></div>`:''}
+  </div>`).join('') : '<div class="empty-state"><div class="empty-icon">📋</div><div>No bookings yet</div></div>'}`;
+}
+
+// ── NOTIFICATIONS ──
+function renderNotifs() {
+  const unread = NOTIFS.filter(n=>!n.read&&!ST.notifRead.includes(n.id)).length;
+  document.getElementById('cNotifs').innerHTML = `
+  <div class="page-header">
+    <div><div class="page-title">Notifications</div><div class="page-subtitle">${unread} unread</div></div>
+    ${unread?`<button class="btn btn-outline btn-sm" onclick="markAllRead()">Mark all read</button>`:''}
+  </div>
+  ${NOTIFS.map(n=>{
+    const read = n.read || ST.notifRead.includes(n.id);
+    return `<div class="notif-card ${read?'':'unread'}" onclick="ST.notifRead.push('${n.id}');renderNotifs()">
+      <div class="notif-icon-box" style="background:${n.bg}">${n.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700">${n.title}</div>
+        <div style="font-size:12px;color:var(--grey);margin-top:2px;line-height:1.5">${n.msg}</div>
+        <div style="font-size:11px;color:var(--grey);margin-top:6px">${n.time}</div>
+      </div>
+      ${!read?'<div style="width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:4px;flex-shrink:0"></div>':''}
+    </div>`;
+  }).join('')}`;
+  updateNotifDot();
+}
+
+function markAllRead() {
+  ST.notifRead = NOTIFS.map(n=>n.id);
+  renderNotifs();
+}
+
+function updateNotifDot() {
+  const count = NOTIFS.filter(n=>!n.read&&!ST.notifRead.includes(n.id)).length;
+  const dot = document.getElementById('notifDot');
+  if (!dot) return;
+  dot.style.display = count ? 'flex' : 'none';
+  dot.textContent = count;
+}
+
+// ── FAVOURITES ──
+function renderFavourites() {
+  const favs = BARBERS.filter(b=>ST.favs.includes(b.id));
+  document.getElementById('cFavs').innerHTML = `
+  <div class="page-header"><div class="page-title">Favourites</div><span class="sec-count">${favs.length} saved</span></div>
+  ${favs.length ? favs.map(b=>barberCardHTML(b)).join('') : '<div class="empty-state"><div class="empty-icon">❤️</div><div>Heart a barber to save them here</div></div>'}`;
+}
+
+// ── CUSTOMER PROFILE ──
+function renderCustomerProfile() {
+  document.getElementById('cProfile').innerHTML = `
+  <div class="page-header"><div class="page-title">Profile</div><button class="btn btn-purple btn-sm" onclick="snack('Profile updated ✓')">Save</button></div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--purple-tint);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800">U</div>
+      <div>
+        <div style="font-size:18px;font-weight:800">User</div>
+        <div style="font-size:13px;color:var(--grey)">+91 98765 43210</div>
+        <span class="badge badge-purple" style="margin-top:6px">⭐ Loyal Customer</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center;border-top:1px solid var(--border);padding-top:14px">
+      ${[['Bookings',MY_BOOKINGS.length],['Favourites',ST.favs.length],['Completed',MY_BOOKINGS.filter(b=>b.status==='completed').length]].map(([l,v])=>`<div><div style="font-size:18px;font-weight:800;color:var(--purple)">${v}</div><div style="font-size:11px;color:var(--grey)">${l}</div></div>`).join('')}
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">Personal Info</div>
+    <div class="field"><label>Full Name</label><input value="User"/></div>
+    <div class="field"><label>Email</label><input type="email" placeholder="email@example.com"/></div>
+    <div class="field"><label>Phone</label><input value="+91 98765 43210" readonly style="background:var(--bg);color:var(--grey)"/></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">Notification Preferences</div>
+    ${[['Booking confirmations',true],['Appointment reminders',true],['Promotional offers',false]].map(([lbl,def])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:14px">${lbl}</span>
+      <label class="toggle"><input type="checkbox" ${def?'checked':''}/><div class="toggle-track"></div></label>
+    </div>`).join('')}
+  </div>
+  <button class="btn btn-red-outline btn-full" onclick="doLogout()">🚪 Log Out</button>`;
+}
+
+// ── CONFIRM DIALOG ──
+function confirm2(title, msg, btnLabel, btnColor, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent = btnLabel; btn.style.background = btnColor; btn.style.color = '#fff';
+  btn.onclick = () => { closeOverlay('confirmOverlay'); cb(); };
+  openOverlay('confirmOverlay');
+}
+</script>
+</body>
+</html>
