@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>BarberBook</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --gold:#C9A84C; --gold-l:#E8C97A; --gold-d:#8B6914;
+  --black:#080808; --dark:#111; --gray1:#181818; --gray2:#222;
+  --gray3:#2e2e2e; --muted:#555; --light:#999; --cream:#f0ebe0;
+  --white:#fff; --red:#e74c3c; --green:#2ecc71; --blue:#3498db;
+  --card-bg:#161616; --border:rgba(201,168,76,0.12);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;background:var(--black);}
+body{font-family:'DM Sans',sans-serif;color:var(--cream);display:flex;justify-content:center;align-items:center;}
+
+/* PHONE SHELL */
+.phone-shell{
+  width:390px;height:844px;
+  background:var(--black);
+  border-radius:52px;
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 40px 120px rgba(0,0,0,0.9),inset 0 0 0 1px rgba(255,255,255,0.04);
+  overflow:hidden;position:relative;
+  display:flex;flex-direction:column;
+}
+
+/* STATUS BAR */
+.status-bar{
+  height:44px;padding:14px 28px 0;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;position:relative;z-index:50;
+}
+.status-time{font-size:15px;font-weight:600;color:var(--cream);}
+.status-icons{display:flex;gap:6px;align-items:center;}
+.status-icons span{font-size:13px;color:var(--cream);}
+
+/* NOTCH */
+.notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:126px;height:34px;
+  background:var(--black);border-radius:0 0 20px 20px;z-index:60;
+}
+
+/* SCREEN */
+.screen{
+  flex:1;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;
+}
+
+/* ROLE SWITCHER */
+.role-switcher{
+  position:absolute;top:8px;right:16px;z-index:100;
+}
+.role-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--gray2);border:1px solid var(--border);
+  color:var(--gold);padding:6px 12px;border-radius:20px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;letter-spacing:0.5px;
+}
+.role-menu{
+  position:absolute;top:36px;right:0;
+  background:var(--gray1);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;min-width:160px;
+  display:none;
+  box-shadow:0 20px 40px rgba(0,0,0,0.6);
+}
+.role-menu.open{display:block;}
+.role-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;font-size:13px;cursor:pointer;
+  transition:background 0.15s;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.role-opt:last-child{border:none;}
+.role-opt:hover{background:var(--gray2);}
+.role-opt .ri{font-size:16px;}
+.role-opt .rn{color:var(--cream);font-weight:500;}
+.role-opt .rd{font-size:11px;color:var(--muted);}
+.role-opt.active .rn{color:var(--gold);}
+
+/* SCROLLABLE */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.scroll::-webkit-scrollbar{display:none;}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  height:72px;border-top:1px solid var(--border);
+  background:var(--dark);
+  display:flex;align-items:center;justify-content:space-around;
+  padding-bottom:8px;flex-shrink:0;
+}
+.nav-tab{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:6px 12px;border-radius:12px;
+  transition:all 0.2s;min-width:60px;
+}
+.nav-tab.active{background:rgba(201,168,76,0.1);}
+.nav-tab .ti{font-size:20px;}
+.nav-tab .tl{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0.3px;}
+.nav-tab.active .tl{color:var(--gold);}
+
+/* HEADER */
+.app-header{
+  padding:16px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.header-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--gold);}
+.header-logo span{color:var(--cream);}
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--gold);display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--black);
+}
+
+/* PAGE */
+.page{display:none;flex-direction:column;height:100%;}
+.page.active{display:flex;}
+
+/* COMMON */
+.section-label{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);font-weight:600;
+  padding:0 20px;margin-bottom:10px;margin-top:20px;
+}
+.card{
+  margin:0 16px 10px;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+}
+.card-pad{padding:16px;}
+
+/* TOKEN CARD */
+.token-hero{
+  margin:12px 16px;
+  background:linear-gradient(135deg,#1a1300,#231900);
+  border:1px solid rgba(201,168,76,0.35);
+  border-radius:20px;padding:24px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.token-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(201,168,76,0.08),transparent 70%);
+}
+.token-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;font-weight:600;}
+.token-num{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--gold);line-height:1;position:relative;}
+.token-sub{font-size:13px;color:var(--light);margin-top:4px;}
+.token-info{display:flex;justify-content:center;gap:20px;margin-top:16px;}
+.ti-item{text-align:center;}
+.ti-val{font-size:15px;font-weight:700;color:var(--cream);}
+.ti-key{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* QUEUE ITEM */
+.q-item{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.q-item:last-child{border:none;}
+.q-num{
+  font-family:'Bebas Neue',sans-serif;font-size:24px;
+  color:var(--gold);width:32px;flex-shrink:0;
+}
+.q-num.dim{color:var(--muted);}
+.q-info{flex:1;}
+.q-name{font-size:14px;font-weight:600;color:var(--cream);}
+.q-detail{font-size:11px;color:var(--muted);margin-top:2px;}
+.q-badge{
+  font-size:10px;font-weight:700;letter-spacing:0.5px;
+  padding:4px 8px;border-radius:6px;
+}
+.badge-active{background:rgba(231,76,60,0.15);color:var(--red);}
+.badge-wait{background:rgba(201,168,76,0.12);color:var(--gold);}
+.badge-done{background:rgba(46,204,113,0.12);color:var(--green);}
+.badge-you{background:var(--gold);color:var(--black);}
+
+/* BUTTONS */
+.btn{
+  width:100%;padding:16px;border-radius:14px;border:none;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;
+}
+.btn-gold{background:var(--gold);color:var(--black);}
+.btn-gold:hover{background:var(--gold-l);}
+.btn-outline{background:transparent;color:var(--cream);border:1px solid var(--border);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-red{background:rgba(231,76,60,0.12);color:var(--red);border:1px solid rgba(231,76,60,0.2);}
+.btn-green{background:rgba(46,204,113,0.12);color:var(--green);border:1px solid rgba(46,204,113,0.2);}
+.btn-sm{padding:10px 16px;font-size:13px;border-radius:10px;}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 16px 10px;}
+.stat-card{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:14px;padding:16px;
+}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1;}
+.stat-key{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* BARBER QUEUE ITEM */
+.bq-item{
+  padding:16px;border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.bq-item:last-child{border:none;}
+.bq-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.bq-num{
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);
+  flex-shrink:0;
+}
+.bq-name{font-size:15px;font-weight:600;flex:1;}
+.bq-time{font-size:12px;color:var(--muted);}
+.bq-service{
+  display:inline-block;
+  font-size:11px;padding:4px 10px;border-radius:6px;
+  background:var(--gray2);color:var(--light);
+}
+.bq-actions{display:flex;gap:8px;margin-top:10px;}
+
+/* BOOKING FORM */
+.form-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;letter-spacing:0.5px;}
+.form-select,.form-input{
+  width:100%;padding:13px 14px;
+  background:var(--gray2);border:1px solid var(--border);
+  border-radius:12px;color:var(--cream);
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  outline:none;transition:border-color 0.2s;
+  -webkit-appearance:none;
+}
+.form-select:focus,.form-input:focus{border-color:var(--gold);}
+.form-select option{background:var(--gray1);}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.time-slot{
+  padding:10px;text-align:center;border-radius:10px;
+  background:var(--gray2);border:1px solid var(--border);
+  font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;
+}
+.time-slot.sel{background:rgba(201,168,76,0.15);border-color:var(--gold);color:var(--gold);}
+.time-slot.full{opacity:0.35;cursor:not-allowed;}
+
+/* ANALYTICS */
+.chart-bar-wrap{padding:0 16px;margin-bottom:10px;}
+.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.cbl{font-size:12px;color:var(--light);width:28px;text-align:right;flex-shrink:0;}
+.cb-track{flex:1;height:22px;background:var(--gray2);border-radius:6px;overflow:hidden;}
+.cb-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:var(--black);transition:width 0.8s ease;}
+.cb-val{font-size:12px;color:var(--gold);font-weight:700;width:40px;text-align:right;}
+
+/* NOTIFICATIONS */
+.notif{
+  display:flex;gap:12px;padding:14px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  align-items:flex-start;
+}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:5px;flex-shrink:0;}
+.notif-dot.read{background:var(--gray3);}
+.notif-text{font-size:13px;color:var(--cream);line-height:1.5;}
+.notif-time{font-size:11px;color:var(--muted);margin-top:3px;}
+
+/* PROFILE */
+.profile-hero{
+  text-align:center;padding:24px 20px 16px;
+}
+.profile-avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--gold);display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--black);
+  margin:0 auto 12px;border:3px solid rgba(201,168,76,0.3);
+}
+.profile-name{font-size:20px;font-weight:700;}
+.profile-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.menu-item{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.03);
+  cursor:pointer;
+}
+.menu-item:hover{background:rgba(255,255,255,0.02);}
+.menu-icon{font-size:18px;width:24px;text-align:center;}
+.menu-text{flex:1;font-size:14px;font-weight:500;}
+.menu-arrow{color:var(--muted);font-size:16px;}
+
+/* SHEET OVERLAY */
+.sheet{
+  position:absolute;inset:0;background:rgba(0,0,0,0.7);
+  z-index:200;display:none;align-items:flex-end;
+}
+.sheet.open{display:flex;}
+.sheet-body{
+  background:var(--gray1);width:100%;
+  border-radius:24px 24px 0 0;
+  padding:20px;max-height:90%;overflow-y:auto;
+  animation:slideUp 0.3s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-handle{width:36px;height:4px;background:var(--gray3);border-radius:2px;margin:0 auto 20px;}
+.sheet-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:16px;}
+
+/* TOAST */
+.toast{
+  position:absolute;bottom:90px;left:50%;transform:translateX(-50%);
+  background:var(--gray1);border:1px solid var(--border);
+  border-radius:12px;padding:12px 20px;
+  font-size:13px;font-weight:600;color:var(--cream);
+  white-space:nowrap;z-index:300;
+  animation:toastIn 0.3s ease,toastOut 0.3s ease 2s forwards;
+  pointer-events:none;
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@keyframes toastOut{to{opacity:0;}}
+
+/* SEARCH */
+.search-bar{
+  margin:0 16px 12px;
+  display:flex;align-items:center;gap:10px;
+  background:var(--gray2);border:1px solid var(--border);
+  border-radius:14px;padding:12px 14px;
+}
+.search-icon{font-size:16px;color:var(--muted);}
+.search-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--cream);font-family:'DM Sans',sans-serif;font-size:14px;
+}
+.search-input::placeholder{color:var(--muted);}
+
+/* SWITCH TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.03);}
+.toggle{width:44px;height:26px;background:var(--gray3);border-radius:13px;position:relative;cursor:pointer;transition:background 0.2s;}
+.toggle.on{background:var(--gold);}
+.toggle::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform 0.2s;}
+.toggle.on::after{transform:translateX(18px);}
+
+/* LIVE INDICATOR */
+.live-dot{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600;}
+.live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:livePulse 1.5s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+@media(max-height:860px){
+  .phone-shell{height:100vh;border-radius:0;border:none;}
+}
+@media(max-width:420px){
+  .phone-shell{width:100vw;border-radius:0;border:none;}
+}
+</style>
+</head>
+<body>
+<div class="phone-shell">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span class="status-time" id="clock">9:41</span>
+    <div class="status-icons">
+      <span>●●●</span><span>WiFi</span><span>🔋</span>
+    </div>
+  </div>
+
+  <!-- ROLE SWITCHER -->
+  <div class="role-switcher">
+    <button class="role-btn" onclick="toggleRoleMenu()">
+      <span id="role-icon">👤</span>
+      <span id="role-label">Customer</span>
+      <span>▾</span>
+    </button>
+    <div class="role-menu" id="roleMenu">
+      <div class="role-opt active" onclick="setRole('customer')">
+        <span class="ri">👤</span>
+        <div><div class="rn">Customer</div><div class="rd">Book & track queue</div></div>
+      </div>
+      <div class="role-opt" onclick="setRole('barber')">
+        <span class="ri">✂️</span>
+        <div><div class="rn">Barber</div><div class="rd">Manage your queue</div></div>
+      </div>
+      <div class="role-opt" onclick="setRole('owner')">
+        <span class="ri">📊</span>
+        <div><div class="rn">Owner</div><div class="rd">Analytics & settings</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+
+    <!-- ════════════ CUSTOMER VIEW ════════════ -->
+    <div class="page active" id="view-customer">
+
+      <!-- TAB: HOME -->
+      <div class="page active" id="c-home" style="flex:1;flex-direction:column;">
+        <div class="app-header">
+          <div>
+            <div style="font-size:12px;color:var(--muted);">Good morning,</div>
+            <div style="font-size:18px;font-weight:700;">Arjun 👋</div>
+          </div>
+          <div class="avatar">A</div>
+        </div>
+        <div class="scroll">
+
+          <!-- Active Token -->
+          <div class="token-hero">
+            <div class="token-tag">Your Token</div>
+            <div class="token-num">#04</div>
+            <div class="token-sub">Classic Cut · Barber Ravi</div>
+            <div class="token-info">
+              <div class="ti-item"><div class="ti-val">11:20 AM</div><div class="ti-key">Slot Time</div></div>
+              <div class="ti-item"><div class="ti-val">~12 min</div><div class="ti-key">Est. Wait</div></div>
+              <div class="ti-item"><div class="ti-val">3 ahead</div><div class="ti-key">In Queue</div></div>
+            </div>
+          </div>
+
+          <!-- Live Queue -->
+          <div style="padding:0 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div class="section-label" style="padding:0;margin:0;">Live Queue</div>
+            <div class="live-dot">LIVE</div>
+          </div>
+          <div class="card">
+            <div class="q-item"><div class="q-num">01</div><div class="q-info"><div class="q-name">Karthik M.</div><div class="q-detail">10:00 AM · Fade + Beard</div></div><span class="q-badge badge-active">In Chair</span></div>
+            <div class="q-item"><div class="q-num">02</div><div class="q-info"><div class="q-name">Deepak R.</div><div class="q-detail">10:30 AM · Simple Trim</div></div><span class="q-badge badge-wait">Waiting</span></div>
+            <div class="q-item"><div class="q-num">03</div><div class="q-info"><div class="q-name">Vikram S.</div><div class="q-detail">11:00 AM · Full Style</div></div><span class="q-badge badge-wait">Waiting</span></div>
+            <div class="q-item" style="background:rgba(201,168,76,0.04);">
+              <div class="q-num">04</div>
+              <div class="q-info"><div class="q-name" style="color:var(--gold);">You</div><div class="q-detail">11:20 AM · Classic Cut</div></div>
+              <span class="q-badge badge-you">YOU</span>
+            </div>
+            <div class="q-item" style="opacity:0.4;"><div class="q-num dim">05</div><div class="q-info"><div class="q-name">Suresh P.</div><div class="q-detail">11:40 AM · Beard Trim</div></div><span class="q-badge badge-wait">Waiting</span></div>
+          </div>
+
+          <!-- Actions -->
+          <div style="padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+            <button class="btn btn-outline btn-sm" onclick="openSheet('reschedule-sheet')">📅 Reschedule</button>
+            <button class="btn btn-red btn-sm" onclick="showToast('❌ Booking cancelled')">Cancel</button>
+          </div>
+
+          <!-- Nearby Shops -->
+          <div class="section-label">Nearby Shops</div>
+          <div style="padding:0 16px 20px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="card" style="margin:0;" onclick="openSheet('book-sheet')">
+                <div class="card-pad" style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:44px;height:44px;border-radius:12px;background:var(--gray2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">✂️</div>
+                  <div style="flex:1;">
+                    <div style="font-weight:600;font-size:14px;">Raja's Barber Shop</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">0.3 km · 3 slots available</div>
+                  </div>
+                  <div style="text-align:right;"><div style="font-size:12px;color:var(--green);font-weight:600;">Open</div><div style="font-size:11px;color:var(--muted);">⭐ 4.7</div></div>
+                </div>
+              </div>
+              <div class="card" style="margin:0;" onclick="openSheet('book-sheet')">
+                <div class="card-pad" style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:44px;height:44px;border-radius:12px;background:var(--gray2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💈</div>
+                  <div style="flex:1;">
+                    <div style="font-weight:600;font-size:14px;">Style Hub</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">0.8 km · 6 slots available</div>
+                  </div>
+                  <div style="text-align:right;"><div style="font-size:12px;color:var(--green);font-weight:600;">Open</div><div style="font-size:11px;color:var(--muted);">⭐ 4.4</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: BOOK -->
+      <div class="page" id="c-book" style="flex:1;flex-direction:column;">
+        <div class="app-header">
+          <div class="header-logo">Barber<span>Book</span></div>
+        </div>
+        <div class="scroll" style="padding-bottom:16px;">
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" placeholder="Search barber shops..."/>
+          </div>
+          <div class="section-label">Available Now</div>
+          <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px;">
+            <div class="card" style="margin:0;" onclick="openSheet('book-sheet')">
+              <div class="card-pad">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                  <div style="width:48px;height:48px;border-radius:14px;background:var(--gray2);display:flex;align-items:center;justify-content:center;font-size:22px;">✂️</div>
+                  <div style="flex:1;">
+                    <div style="font-weight:700;font-size:15px;">Raja's Barber Shop</div>
+                    <div style="font-size:11px;color:var(--muted);">Anna Nagar · 0.3 km</div>
+                  </div>
+                  <div style="font-size:12px;color:var(--green);font-weight:600;">⭐ 4.7</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                  <span style="font-size:11px;background:var(--gray2);padding:4px 10px;border-radius:8px;color:var(--light);">Haircut Rs.150</span>
+                  <span style="font-size:11px;background:var(--gray2);padding:4px 10px;border-radius:8px;color:var(--light);">Beard Rs.60</span>
+                  <span style="font-size:11px;background:var(--gray2);padding:4px 10px;border-radius:8px;color:var(--light);">3 barbers</span>
+                </div>
+                <button class="btn btn-gold btn-sm">Book Now →</button>
+              </div>
+            </div>
+            <div class="card" style="margin:0;" onclick="openSheet('book-sheet')">
+              <div class="card-pad">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                  <div style="width:48px;height:48px;border-radius:14px;background:var(--gray2);display:flex;align-items:center;justify-content:center;font-size:22px;">💈</div>
+                  <div style="flex:1;">
+                    <div style="font-weight:700;font-size:15px;">Style Hub</div>
+                    <div style="font-size:11px;color:var(--muted);">T.Nagar · 0.8 km</div>
+                  </div>
+                  <div style="font-size:12px;color:var(--green);font-weight:600;">⭐ 4.4</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                  <span style="font-size:11px;background:var(--gray2);padding:4px 10px;border-radius:8px;color:var(--light);">Haircut Rs.120</span>
+                  <span style="font-size:11px;background:var(--gray2);padding:4px 10px;border-radius:8px;color:var(--light);">Beard Rs.50</span>
+                  <span style="font-size:11px;background:var(--gray2);padding:4px 10px;border-radius:8px;color:var(--light);">2 barbers</span>
+                </div>
+                <button class="btn btn-gold btn-sm">Book Now →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: HISTORY -->
+      <div class="page" id="c-history" style="flex:1;flex-direction:column;">
+        <div class="app-header"><div style="font-size:18px;font-weight:700;">My Bookings</div></div>
+        <div class="scroll">
+          <div class="section-label">Recent</div>
+          <div class="card">
+            <div class="q-item"><div style="width:40px;height:40px;border-radius:12px;background:rgba(46,204,113,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✅</div><div class="q-info"><div class="q-name">Raja's Barber Shop</div><div class="q-detail">Classic Cut · 2 days ago · Rs.150</div></div><span class="q-badge badge-done">Done</span></div>
+            <div class="q-item"><div style="width:40px;height:40px;border-radius:12px;background:rgba(46,204,113,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✅</div><div class="q-info"><div class="q-name">Style Hub</div><div class="q-detail">Beard Trim · 1 week ago · Rs.60</div></div><span class="q-badge badge-done">Done</span></div>
+            <div class="q-item"><div style="width:40px;height:40px;border-radius:12px;background:rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✂️</div><div class="q-info"><div class="q-name">Raja's Barber Shop</div><div class="q-detail">Fade + Beard · 2 weeks ago · Rs.210</div></div><span class="q-badge badge-done">Done</span></div>
+          </div>
+          <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Total spent this month: <span style="color:var(--gold);font-weight:700;">Rs. 420</span></div>
+        </div>
+      </div>
+
+      <!-- TAB: PROFILE (customer) -->
+      <div class="page" id="c-profile" style="flex:1;flex-direction:column;">
+        <div class="scroll">
+          <div class="profile-hero">
+            <div class="profile-avatar">A</div>
+            <div class="profile-name">Arjun Sharma</div>
+            <div class="profile-sub">+91 98765 43210 · Customer</div>
+          </div>
+          <div class="card">
+            <div class="menu-item"><span class="menu-icon">📋</span><span class="menu-text">My Bookings</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">🔔</span><span class="menu-text">Notifications</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">💳</span><span class="menu-text">Payment Methods</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">❓</span><span class="menu-text">Help & Support</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item" style="color:var(--red);"><span class="menu-icon">🚪</span><span class="menu-text" style="color:var(--red);">Log Out</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV (customer) -->
+      <div class="bottom-nav" id="customer-nav">
+        <div class="nav-tab active" onclick="cTab('home',this)"><div class="ti">🏠</div><div class="tl">Home</div></div>
+        <div class="nav-tab" onclick="cTab('book',this)"><div class="ti">✂️</div><div class="tl">Book</div></div>
+        <div class="nav-tab" onclick="cTab('history',this)"><div class="ti">📋</div><div class="tl">History</div></div>
+        <div class="nav-tab" onclick="cTab('profile',this)"><div class="ti">👤</div><div class="tl">Profile</div></div>
+      </div>
+    </div>
+
+    <!-- ════════════ BARBER VIEW ════════════ -->
+    <div class="page" id="view-barber">
+      <!-- TAB: QUEUE -->
+      <div class="page active" id="b-queue" style="flex:1;flex-direction:column;">
+        <div class="app-header">
+          <div>
+            <div style="font-size:12px;color:var(--muted);">Barber Dashboard</div>
+            <div style="font-size:18px;font-weight:700;">Ravi Kumar ✂️</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="live-dot">ON DUTY</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Slot: 10AM–7PM</div>
+          </div>
+        </div>
+        <div class="scroll">
+          <div class="stat-row">
+            <div class="stat-card"><div class="stat-val">12</div><div class="stat-key">Today's Bookings</div></div>
+            <div class="stat-card"><div class="stat-val">4</div><div class="stat-key">Done So Far</div></div>
+            <div class="stat-card"><div class="stat-val">8</div><div class="stat-key">Remaining</div></div>
+            <div class="stat-card"><div class="stat-val">Rs.600</div><div class="stat-key">Earned Today</div></div>
+          </div>
+
+          <div style="padding:0 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div class="section-label" style="padding:0;margin:0;">Today's Queue</div>
+            <div class="live-dot">LIVE</div>
+          </div>
+
+          <div class="card">
+            <!-- Current -->
+            <div class="bq-item" style="background:rgba(231,76,60,0.04);border-left:3px solid var(--red);">
+              <div class="bq-top">
+                <div class="bq-num" style="background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);color:var(--red);">01</div>
+                <div style="flex:1;"><div class="bq-name">Karthik M.</div><div class="bq-time">Started 10:05 AM</div></div>
+                <span class="q-badge badge-active">In Chair</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <span class="bq-service">Fade + Beard</span>
+                <span style="font-size:11px;color:var(--muted);">~20 min</span>
+              </div>
+              <div class="bq-actions">
+                <button class="btn btn-green btn-sm" style="flex:1;" onclick="showToast('✅ Marked done!')">Done ✓</button>
+                <button class="btn btn-outline btn-sm" style="flex:1;" onclick="showToast('⏭ Skipped')">Skip</button>
+              </div>
+            </div>
+
+            <div class="bq-item">
+              <div class="bq-top">
+                <div class="bq-num">02</div>
+                <div style="flex:1;"><div class="bq-name">Deepak R.</div><div class="bq-time">10:30 AM slot</div></div>
+                <span class="q-badge badge-wait">Next</span>
+              </div>
+              <div><span class="bq-service">Simple Trim</span></div>
+            </div>
+            <div class="bq-item">
+              <div class="bq-top">
+                <div class="bq-num">03</div>
+                <div style="flex:1;"><div class="bq-name">Vikram S.</div><div class="bq-time">11:00 AM slot</div></div>
+                <span class="q-badge badge-wait">Waiting</span>
+              </div>
+              <div><span class="bq-service">Full Style</span></div>
+            </div>
+            <div class="bq-item">
+              <div class="bq-top">
+                <div class="bq-num">04</div>
+                <div style="flex:1;"><div class="bq-name">Arjun S.</div><div class="bq-time">11:20 AM slot</div></div>
+                <span class="q-badge badge-wait">Waiting</span>
+              </div>
+              <div><span class="bq-service">Classic Cut</span></div>
+            </div>
+          </div>
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: SCHEDULE -->
+      <div class="page" id="b-schedule" style="flex:1;flex-direction:column;">
+        <div class="app-header"><div style="font-size:18px;font-weight:700;">My Schedule</div></div>
+        <div class="scroll">
+          <div class="section-label">Today — 12 bookings</div>
+          <div class="card">
+            <div class="q-item"><div style="font-size:12px;color:var(--muted);width:52px;flex-shrink:0;">10:00</div><div class="q-info"><div class="q-name">Karthik M.</div><div class="q-detail">Fade + Beard · Rs.210</div></div><span class="q-badge badge-done">Done</span></div>
+            <div class="q-item"><div style="font-size:12px;color:var(--muted);width:52px;flex-shrink:0;">10:30</div><div class="q-info"><div class="q-name">Deepak R.</div><div class="q-detail">Simple Trim · Rs.150</div></div><span class="q-badge badge-active">Now</span></div>
+            <div class="q-item"><div style="font-size:12px;color:var(--muted);width:52px;flex-shrink:0;">11:00</div><div class="q-info"><div class="q-name">Vikram S.</div><div class="q-detail">Full Style · Rs.180</div></div><span class="q-badge badge-wait">—</span></div>
+            <div class="q-item"><div style="font-size:12px;color:var(--muted);width:52px;flex-shrink:0;">11:20</div><div class="q-info"><div class="q-name">Arjun S.</div><div class="q-detail">Classic Cut · Rs.150</div></div><span class="q-badge badge-wait">—</span></div>
+            <div class="q-item"><div style="font-size:12px;color:var(--muted);width:52px;flex-shrink:0;">11:40</div><div class="q-info"><div class="q-name">Suresh P.</div><div class="q-detail">Beard Trim · Rs.60</div></div><span class="q-badge badge-wait">—</span></div>
+          </div>
+
+          <div class="section-label">Availability</div>
+          <div class="card">
+            <div class="toggle-row"><span style="font-size:14px;">Taking new bookings</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span style="font-size:14px;">Walk-ins welcome</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span style="font-size:14px;">On break</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: EARNINGS -->
+      <div class="page" id="b-earnings" style="flex:1;flex-direction:column;">
+        <div class="app-header"><div style="font-size:18px;font-weight:700;">Earnings</div></div>
+        <div class="scroll">
+          <div class="stat-row">
+            <div class="stat-card"><div class="stat-val">Rs.600</div><div class="stat-key">Today</div></div>
+            <div class="stat-card"><div class="stat-val">Rs.4,200</div><div class="stat-key">This Week</div></div>
+            <div class="stat-card"><div class="stat-val">Rs.17,400</div><div class="stat-key">This Month</div></div>
+            <div class="stat-card"><div class="stat-val">116</div><div class="stat-key">Cuts Done</div></div>
+          </div>
+          <div class="section-label">This Week</div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar-row"><span class="cbl">Mon</span><div class="cb-track"><div class="cb-fill" style="width:80%;background:var(--gold);">Rs.720</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Tue</span><div class="cb-track"><div class="cb-fill" style="width:60%;background:var(--gold);">Rs.540</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Wed</span><div class="cb-track"><div class="cb-fill" style="width:90%;background:var(--gold);">Rs.810</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Thu</span><div class="cb-track"><div class="cb-fill" style="width:70%;background:var(--gold);">Rs.630</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Fri</span><div class="cb-track"><div class="cb-fill" style="width:65%;background:var(--gold);">Rs.585</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Sat</span><div class="cb-track"><div class="cb-fill" style="width:100%;background:var(--gold-l);">Rs.900</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Sun</span><div class="cb-track"><div class="cb-fill" style="width:55%;background:var(--muted);">Rs.415</div></div></div>
+          </div>
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: PROFILE (barber) -->
+      <div class="page" id="b-profile" style="flex:1;flex-direction:column;">
+        <div class="scroll">
+          <div class="profile-hero">
+            <div class="profile-avatar">R</div>
+            <div class="profile-name">Ravi Kumar</div>
+            <div class="profile-sub">✂️ Barber · Raja's Shop · 5 yrs exp</div>
+          </div>
+          <div class="card">
+            <div class="menu-item"><span class="menu-icon">⚙️</span><span class="menu-text">My Services & Pricing</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">📅</span><span class="menu-text">Working Hours</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">🔔</span><span class="menu-text">Notifications</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item" style="color:var(--red);"><span class="menu-icon">🚪</span><span class="menu-text" style="color:var(--red);">Log Out</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV (barber) -->
+      <div class="bottom-nav" id="barber-nav">
+        <div class="nav-tab active" onclick="bTab('queue',this)"><div class="ti">📋</div><div class="tl">Queue</div></div>
+        <div class="nav-tab" onclick="bTab('schedule',this)"><div class="ti">📅</div><div class="tl">Schedule</div></div>
+        <div class="nav-tab" onclick="bTab('earnings',this)"><div class="ti">💰</div><div class="tl">Earnings</div></div>
+        <div class="nav-tab" onclick="bTab('profile',this)"><div class="ti">✂️</div><div class="tl">Profile</div></div>
+      </div>
+    </div>
+
+    <!-- ════════════ OWNER VIEW ════════════ -->
+    <div class="page" id="view-owner">
+      <!-- TAB: DASHBOARD -->
+      <div class="page active" id="o-dashboard" style="flex:1;flex-direction:column;">
+        <div class="app-header">
+          <div>
+            <div style="font-size:12px;color:var(--muted);">Raja's Barber Shop</div>
+            <div style="font-size:18px;font-weight:700;">Owner Dashboard 📊</div>
+          </div>
+          <div class="avatar" style="background:var(--blue);">R</div>
+        </div>
+        <div class="scroll">
+          <div class="stat-row">
+            <div class="stat-card" style="border-color:rgba(201,168,76,0.3);"><div class="stat-val">Rs.2,840</div><div class="stat-key">Today's Revenue</div></div>
+            <div class="stat-card"><div class="stat-val">24</div><div class="stat-key">Bookings Today</div></div>
+            <div class="stat-card"><div class="stat-val">3</div><div class="stat-key">Active Barbers</div></div>
+            <div class="stat-card"><div class="stat-val">92%</div><div class="stat-key">Slot Utilisation</div></div>
+          </div>
+
+          <div class="section-label">Revenue This Week</div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar-row"><span class="cbl">Mon</span><div class="cb-track"><div class="cb-fill" style="width:75%;background:var(--gold);">Rs.2,100</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Tue</span><div class="cb-track"><div class="cb-fill" style="width:60%;background:var(--gold);">Rs.1,680</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Wed</span><div class="cb-track"><div class="cb-fill" style="width:85%;background:var(--gold);">Rs.2,380</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Thu</span><div class="cb-track"><div class="cb-fill" style="width:70%;background:var(--gold);">Rs.1,960</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Fri</span><div class="cb-track"><div class="cb-fill" style="width:90%;background:var(--gold);">Rs.2,520</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Sat</span><div class="cb-track"><div class="cb-fill" style="width:100%;background:var(--gold-l);">Rs.2,800</div></div></div>
+            <div class="chart-bar-row"><span class="cbl">Sun</span><div class="cb-track"><div class="cb-fill" style="width:45%;background:var(--muted);">Rs.1,260</div></div></div>
+          </div>
+
+          <div class="section-label">Barber Performance</div>
+          <div class="card">
+            <div class="bq-item">
+              <div class="bq-top" style="margin-bottom:4px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">✂️</div>
+                <div style="flex:1;"><div class="bq-name">Ravi Kumar</div></div>
+                <div style="text-align:right;"><div style="font-size:13px;font-weight:700;color:var(--gold);">Rs.1,020</div><div style="font-size:11px;color:var(--muted);">12 cuts</div></div>
+              </div>
+              <div class="cb-track" style="height:6px;"><div class="cb-fill" style="width:82%;background:var(--gold);"></div></div>
+            </div>
+            <div class="bq-item">
+              <div class="bq-top" style="margin-bottom:4px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,152,219,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">✂️</div>
+                <div style="flex:1;"><div class="bq-name">Suresh M.</div></div>
+                <div style="text-align:right;"><div style="font-size:13px;font-weight:700;color:var(--gold);">Rs.930</div><div style="font-size:11px;color:var(--muted);">9 cuts</div></div>
+              </div>
+              <div class="cb-track" style="height:6px;"><div class="cb-fill" style="width:70%;background:var(--blue);"></div></div>
+            </div>
+            <div class="bq-item">
+              <div class="bq-top" style="margin-bottom:4px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(46,204,113,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">✂️</div>
+                <div style="flex:1;"><div class="bq-name">Anand P.</div></div>
+                <div style="text-align:right;"><div style="font-size:13px;font-weight:700;color:var(--gold);">Rs.890</div><div style="font-size:11px;color:var(--muted);">8 cuts</div></div>
+              </div>
+              <div class="cb-track" style="height:6px;"><div class="cb-fill" style="width:60%;background:var(--green);"></div></div>
+            </div>
+          </div>
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: BOOKINGS -->
+      <div class="page" id="o-bookings" style="flex:1;flex-direction:column;">
+        <div class="app-header"><div style="font-size:18px;font-weight:700;">All Bookings</div></div>
+        <div class="scroll">
+          <div class="section-label">Today · 24 bookings</div>
+          <div class="card">
+            <div class="q-item"><div class="q-num">01</div><div class="q-info"><div class="q-name">Karthik M. → Ravi</div><div class="q-detail">10:00 · Fade + Beard · Rs.210</div></div><span class="q-badge badge-done">Done</span></div>
+            <div class="q-item"><div class="q-num">02</div><div class="q-info"><div class="q-name">Deepak R. → Suresh</div><div class="q-detail">10:30 · Trim · Rs.150</div></div><span class="q-badge badge-active">Active</span></div>
+            <div class="q-item"><div class="q-num">03</div><div class="q-info"><div class="q-name">Vikram S. → Anand</div><div class="q-detail">11:00 · Full Style · Rs.180</div></div><span class="q-badge badge-wait">Queued</span></div>
+            <div class="q-item"><div class="q-num">04</div><div class="q-info"><div class="q-name">Arjun S. → Ravi</div><div class="q-detail">11:20 · Classic · Rs.150</div></div><span class="q-badge badge-wait">Queued</span></div>
+            <div class="q-item"><div class="q-num">05</div><div class="q-info"><div class="q-name">Suresh P. → Suresh</div><div class="q-detail">11:40 · Beard · Rs.60</div></div><span class="q-badge badge-wait">Queued</span></div>
+          </div>
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: SETTINGS -->
+      <div class="page" id="o-settings" style="flex:1;flex-direction:column;">
+        <div class="app-header"><div style="font-size:18px;font-weight:700;">Shop Settings</div></div>
+        <div class="scroll">
+          <div class="section-label">Shop Info</div>
+          <div class="card">
+            <div class="card-pad">
+              <div style="margin-bottom:12px;"><div class="form-label">Shop Name</div><input class="form-input" value="Raja's Barber Shop"/></div>
+              <div style="margin-bottom:12px;"><div class="form-label">Address</div><input class="form-input" value="12, Anna Nagar, Chennai"/></div>
+              <div><div class="form-label">Phone</div><input class="form-input" value="+91 98765 43210"/></div>
+            </div>
+          </div>
+          <div class="section-label">Services & Pricing</div>
+          <div class="card">
+            <div class="toggle-row"><span style="font-size:14px;">Haircut (Rs.150)</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span style="font-size:14px;">Beard Trim (Rs.60)</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span style="font-size:14px;">Full Style (Rs.180)</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row"><span style="font-size:14px;">Head Massage (Rs.80)</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="section-label">App Plan</div>
+          <div class="card">
+            <div class="card-pad" style="text-align:center;">
+              <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Current Plan</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);">FREE</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">30 bookings/month remaining: 6</div>
+              <button class="btn btn-gold" onclick="showToast('🚀 Upgrade coming soon!')">Upgrade to Standard — Rs.299/mo</button>
+            </div>
+          </div>
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+
+      <!-- TAB: PROFILE (owner) -->
+      <div class="page" id="o-profile" style="flex:1;flex-direction:column;">
+        <div class="scroll">
+          <div class="profile-hero">
+            <div class="profile-avatar" style="background:var(--blue);">R</div>
+            <div class="profile-name">Raja Krishnan</div>
+            <div class="profile-sub">📊 Owner · Raja's Barber Shop</div>
+          </div>
+          <div class="card">
+            <div class="menu-item"><span class="menu-icon">🏪</span><span class="menu-text">Shop Settings</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">👥</span><span class="menu-text">Manage Barbers</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">💳</span><span class="menu-text">Billing & Plan</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item"><span class="menu-icon">📊</span><span class="menu-text">Analytics Export</span><span class="menu-arrow">›</span></div>
+            <div class="menu-item" style="color:var(--red);"><span class="menu-icon">🚪</span><span class="menu-text" style="color:var(--red);">Log Out</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV (owner) -->
+      <div class="bottom-nav" id="owner-nav">
+        <div class="nav-tab active" onclick="oTab('dashboard',this)"><div class="ti">📊</div><div class="tl">Dashboard</div></div>
+        <div class="nav-tab" onclick="oTab('bookings',this)"><div class="ti">📋</div><div class="tl">Bookings</div></div>
+        <div class="nav-tab" onclick="oTab('settings',this)"><div class="ti">⚙️</div><div class="tl">Settings</div></div>
+        <div class="nav-tab" onclick="oTab('profile',this)"><div class="ti">👤</div><div class="tl">Profile</div></div>
+      </div>
+    </div>
+
+  </div><!-- /screen -->
+
+  <!-- ══ SHEETS ══ -->
+  <div class="sheet" id="book-sheet" onclick="closeSheetOutside(event,'book-sheet')">
+    <div class="sheet-body">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Book Appointment</div>
+      <div style="margin-bottom:14px;"><div class="form-label">SELECT BARBER</div>
+        <select class="form-select"><option>Ravi Kumar — Available now</option><option>Suresh M. — 11:30 AM next</option><option>Anand P. — 10:50 AM next</option></select>
+      </div>
+      <div style="margin-bottom:14px;"><div class="form-label">SERVICE</div>
+        <select class="form-select"><option>Haircut — Rs.150</option><option>Beard Trim — Rs.60</option><option>Haircut + Beard — Rs.210</option><option>Full Style — Rs.180</option></select>
+      </div>
+      <div style="margin-bottom:16px;"><div class="form-label">SELECT TIME SLOT</div>
+        <div class="time-grid">
+          <div class="time-slot full">10:00</div><div class="time-slot full">10:20</div><div class="time-slot sel">10:40</div>
+          <div class="time-slot">11:00</div><div class="time-slot">11:20</div><div class="time-slot">11:40</div>
+          <div class="time-slot">12:00</div><div class="time-slot">12:20</div><div class="time-slot">12:40</div>
+        </div>
+      </div>
+      <button class="btn btn-gold" onclick="confirmBook()">Confirm Booking →</button>
+    </div>
+  </div>
+
+  <div class="sheet" id="reschedule-sheet" onclick="closeSheetOutside(event,'reschedule-sheet')">
+    <div class="sheet-body">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Reschedule</div>
+      <div style="margin-bottom:16px;"><div class="form-label">NEW TIME SLOT</div>
+        <div class="time-grid">
+          <div class="time-slot full">11:00</div><div class="time-slot full">11:20</div><div class="time-slot">11:40</div>
+          <div class="time-slot sel">12:00</div><div class="time-slot">12:20</div><div class="time-slot">12:40</div>
+        </div>
+      </div>
+      <button class="btn btn-gold" onclick="closeSheet('reschedule-sheet');showToast('📅 Rescheduled to 12:00 PM')">Confirm Reschedule</button>
+    </div>
+  </div>
+
+</div><!-- /phone-shell -->
+
+<script>
+// Clock
+function updateClock(){
+  const now=new Date();
+  let h=now.getHours(),m=now.getMinutes();
+  document.getElementById('clock').textContent=(h%12||12)+':'+(m<10?'0'+m:m);
+}
+updateClock();setInterval(updateClock,1000);
+
+// Role switching
+let currentRole='customer';
+function toggleRoleMenu(){document.getElementById('roleMenu').classList.toggle('open');}
+document.addEventListener('click',function(e){if(!e.target.closest('.role-switcher'))document.getElementById('roleMenu').classList.remove('open');});
+
+function setRole(role){
+  currentRole=role;
+  document.getElementById('roleMenu').classList.remove('open');
+  const icons={customer:'👤',barber:'✂️',owner:'📊'};
+  const labels={customer:'Customer',barber:'Barber',owner:'Owner'};
+  document.getElementById('role-icon').textContent=icons[role];
+  document.getElementById('role-label').textContent=labels[role];
+  document.querySelectorAll('.role-opt').forEach(o=>o.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+role).classList.add('active');
+}
+
+// Tab navigation
+function tabSwitch(prefix,tab,el){
+  document.querySelectorAll('#view-'+prefix+' .page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(prefix[0]+'-'+tab).classList.add('active');
+  document.querySelectorAll('#'+prefix+'-nav .nav-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function cTab(t,el){tabSwitch('customer',t,el);}
+function bTab(t,el){tabSwitch('barber',t,el);}
+function oTab(t,el){tabSwitch('owner',t,el);}
+
+// Sheets
+function openSheet(id){document.getElementById(id).classList.add('open');}
+function closeSheet(id){document.getElementById(id).classList.remove('open');}
+function closeSheetOutside(e,id){if(e.target===document.getElementById(id))closeSheet(id);}
+
+// Time slot selection
+document.querySelectorAll('.time-slot:not(.full)').forEach(s=>{
+  s.addEventListener('click',function(){
+    this.closest('.time-grid').querySelectorAll('.time-slot').forEach(x=>x.classList.remove('sel'));
+    this.classList.add('sel');
+  });
+});
+
+// Confirm booking
+function confirmBook(){
+  closeSheet('book-sheet');
+  showToast('🎉 Token #07 confirmed! 12:00 PM');
+}
+
+// Toast
+function showToast(msg){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div');
+  t.className='toast';t.textContent=msg;
+  document.querySelector('.phone-shell').appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+</script>
+</body>
+</html>
